@@ -126,8 +126,12 @@ B. Create a predefined case team and an assignment rule.
 C. Create a user-based sharing rule and an ad-hoc case team.
 D. Create a queue and a criteria-based sharing rule.
 # Dec. 4, 2025, 3:34 p.m. 
-Answer: D
-Why: A criteria-based sharing rule automatically grants Read/Write access to a specific set of users (such as a public group containing the lead engineers) whenever a case meets defined criteria, such as referencing the new product. Pairing this with a queue allows for efficient routing, ownership, and management of incoming product cases.
+Answer:  B. Create a predefined case team and an assignment rule.
+Why:
+You want the two lead engineers to automatically get read/write access on every new Case for that product. A predefined Case Team lets you specify members (the two engineers) and their access level. An Assignment Rule can detect “product = New Product” and then add that predefined Case Team to matching Cases, granting the needed access automatically.
+A: Auto-response rules only send emails; a public group alone doesn’t grant row-level access automatically.
+C: User-based sharing rules don’t target “new cases that reference a product” as cleanly, and ad-hoc teams aren’t automatic.
+D: A queue helps ownership/routing; a criteria-based sharing rule could grant read-only (or read/write if configured for Case), but using Case Teams is the standard pattern to put named collaborators with defined access on each Case.
 
 13. The VP of sales at Cloud Kicks is receiving an error message that prevents them from saving an opportunity. The administrator attempted the same edit without receiving an error.
  How can the administrator validate the error the user is receiving?
@@ -462,7 +466,7 @@ B. Share the Helpdesk folder with Support Agents with View access.
 C. Share the R&D folder with Support Managers with Edit Access.
 D. Share the Support Reports folder with Support Agents with View Access.
 # Dec. 4, 2025, 3:34 p.m.
-Answer: A, B
+Answer: B, C
 Why: Folder access in Salesforce reports follows a strict top-down inheritance model. Access granted at a parent folder level applies to all nested subfolders underneath it.
 Option A: Sharing the top-level Support Reports folder with Support Managers giving Edit access ensures managers automatically inherit full view/edit permissions for both nested subfolders (Helpdesk and R&D).
 Option B: Sharing only the Helpdesk subfolder directly with Support Agents giving View access allows agents to run Helpdesk reports while restricting their visibility so they cannot see or access the R&D subfolder.
@@ -592,8 +596,7 @@ D. Deactivate the user and delete any records where they are referenced in the D
 
 #Dec. 4, 2025, 3:34 p.m. 
 Answer: C
-Why: The standard Mass Transfer Tool (Mass Transfer Records) allows an administrator to quickly transfer ownership of multiple Accounts—along with their open Opportunities, Contacts, and related records—from one user to another in a single wizard, while preserving existing team setups.
-Trainer Explanation & Concept: When a user is referenced in custom hierarchy fields (such as a custom Direct_Manager__c field), workflow email alerts, or approval processes, Salesforce throws a dependency error if you attempt immediate deactivation. To satisfy HR's demand for immediate access revocation, the administrator must first freeze the user account (which instantly halts logins), update/reassign the hierarchy field references, and then cleanly deactivate the user record.
+Why: When a user is referenced in custom hierarchy fields (such as a custom Direct_Manager__c field), workflow email alerts, or approval processes, Salesforce throws a dependency error if you attempt immediate deactivation. To satisfy HR's demand for immediate access revocation, the administrator must first freeze the user account (which instantly halts logins), update/reassign the hierarchy field references, and then cleanly deactivate the user record.
 
 
 53. The administrator at Cloud Kicks has a custom picklist field on Lead, which is missing on the Contact when leads are converted.
@@ -672,7 +675,7 @@ C. Master-detail relationship field
 D. Standard Account field
 # Dec. 4, 2025, 3:34 p.m. 
 Answer: A
-Trainer Explanation & Concept: Because Opportunity has a standard master-lookup to Account, a read-only Cross-object formula field on Opportunity referencing Account.Industry dynamically surfaces the parent account's industry directly on the opportunity detail page with zero data duplication.
+Trainer Explanation & Concept: Because Opportunity has a standard lookup to Account, a read-only Cross-object formula field on Opportunity referencing Account.Industry dynamically surfaces the parent account's industry directly on the opportunity detail page with zero data duplication.
 
 
 59. An administrator is planning to use Data Loader to mass import new records to a custom object from a new API.
@@ -684,7 +687,7 @@ C. Add a permission set that allows them to import data.
 D. Reset their password and their security token.
 # Dec. 4, 2025, 3:41 p.m.
 Answer: A
-Why: When authenticating through client applications like Data Loader using standard username and password credentials, Salesforce requires users connecting outside a trusted IP range to append their personal security token directly to the end of their password (e.g., PasswordSecurityToken).
+Why: When authenticating through client applications like Data Loader using standard username and password credentials, Salesforce requires users connecting outside a trusted IP range to append their personal security token directly to the end of their password (e.g., PasswordSecurityToken). (In modern data loaders, there is no need to use a security token, because it uses OAuth.)
 60. Northern Trail Outfitters has a custom quick action on Account that creates a new Case.
  How should an administrator make the quick action available on the Salesforce mobile app?
  
@@ -818,7 +821,7 @@ B. Use the standard object for designs.
 C. Add a custom master-detail field for shoe designs on the Product object.
 D. Configure a custom lookup field for shoe designs on the Product object.
 # Aug. 19, 2024, 10:03 a.m.
-Answer: A, C
+Answer: A, D
 Why:
 Create a custom object for shoe designs (A): Since "shoe designs" is a unique business entity with custom stages and attributes, creating a custom object allows Cloud Kicks to track multiple design records associated with a single product.
 Add a custom master-detail field for shoe designs on the Product object (C): Creating a Master-Detail relationship field on the Shoe Design object (pointing to the Product as the master) satisfies two core requirements:
@@ -888,7 +891,11 @@ C. Mark fields required on the page layout.
 D. Use validation rules.
 E. Enable guided selling.
 Answer(s): B, D, E
-Explanation: To ensure key fields are filled out at specific stages, administrators can make fields required on page layouts, use validation rules based on stage names, or utilize Screen Flows / Guided Selling frameworks. Path and Guided Selling alone do not inherently enforce field requirement rules or restrict moving backward unless paired with validation rules or flows. (Note: Depending on exact exam variants, options involving validation rules, page layout requirements, and flows/path controls are standard levers for stage-gating data).
+Explanation:
+Configure Opportunity Path (B) to highlight stage-specific Key Fields and Guidance so reps know what to complete at each stage.
+Use validation rules (D) to enforce that required fields are populated when Stage moves forward; path alone won’t enforce entry.
+Enable guided selling (E) to help reps move forward through stages while preventing them from changing to a previous stage as part of the guided process.
+
 79. Currently, when support reps at Ursa Major Solar close a case, they manually send an email notification to the customer. The support manager would like to automate this process, as too many reps are forgetting this step.
 Which two settings should the administrator use to meet this request? (Choose two.)
 A. Add the Knowledge component to the closed layout
@@ -949,7 +956,7 @@ A. Resetting the password will change the user’s password policy.
 B. Resetting a locked-out user’s password automatically unlocks the user’s account.
 C. Single sign-on users can reset their own passwords using the forgot password link.
 D. After resetting a password, the user may be required to activate their device to successfully log in to Salesforce.
-Answer(s): B. Resetting a locked-out user’s password automatically unlocks the user’s account., D. After resetting a password, the user may be required to activate their device to successfully log in to Salesforce.
+Answer(s): B, D
 Explanation: Resetting a user's password clears out lockout counters and unlocks their account immediately. Additionally, logging in with a new password from an unrecognized browser or IP often triggers identity verification (device activation). Password policies are governed by profiles or permission set password policies, not individual resets, and SSO users typically manage credentials through their identity provider rather than the Salesforce "forgot password" link.
 
 86.  Universal Containers requires a different Lightning page to be displayed when Accounts are viewed in the Sales Console and in the Service Console.
@@ -1058,7 +1065,7 @@ A. Assign single sign-on to a permission set to allow users to log in when outsi
 B. Enforce Login IP Ranges on Every Request must be selected to enforce IP restrictions.
 C. IP address restrictions are set on the profile or globally for the org.
 D. Restrict U2F Security Keys on the user's profile to enforce login hours.
-Answer(s): B. Enforce Login IP Ranges on Every Request must be selected to enforce IP restrictions., C. IP address restrictions are set on the profile or globally for the org.
+Answer(s): B & C
 Explanation: IP address restrictions in Salesforce are configured at the profile level (or globally via network access settings). Additionally, to ensure that users cannot bypass restrictions once logged in (such as by changing networks or using session tokens obtained internally), the "Enforce Login IP Ranges on Every Request" security setting must be enabled. Single sign-on and U2F keys serve different authentication and security purposes.
 
 99. Northern Trail Outfitters has asked an administrator to ensure that when a contact with a title of CEO is created, the contact’s account record gets updated with the CEO’s name.
@@ -1067,7 +1074,7 @@ A. Quick Action
 B. Validation Rule
 C. Workflow Rule
 D. Process Builder
-Answer(s): D. Process Builder
+Answer(s): D. Process Builder or Flow
 Explanation: Process Builder (or Flow Builder, though Process Builder is standard for this context) is used to automate cross-object updates—specifically updating a parent record (Account) based on criteria evaluated on a child record (Contact). Workflow rules are restricted to updating fields on the same object, and validation rules only prevent saving rather than updating records.
 
 100. Users at Cloud Kicks are reporting different options when updating a custom picklist on the Opportunity object based on the kind of opportunity.
@@ -1163,9 +1170,7 @@ B. View the setup audit trail and review for errors.
 C. Set up email logs and review the send error logs.
 D. Review debug logs with the flow logging level.
 
-Answer(s):
-A. Use the native debug feature in the Flow Builder.
-D. Review debug logs with the flow logging level.
+Answer(s):B & D
 
 Explanation: To troubleshoot and identify issues within a Flow, administrators can use the built-in debugging tool in Flow Builder to step through the flow execution interactively (A) or set the appropriate logging levels for workflows and triggers to inspect detailed debug logs generated during runtime (D). Setup audit trails (B) track configuration changes rather than runtime execution errors, and email logs (C) only track email delivery.
 
@@ -1257,11 +1262,13 @@ C. In the Account object manager, create a custom compact layout.
 
 D. From the page layout editor, drag the field to the highlights panel.
 
-Answer(s): C
+Answer(s): D
 
 Explanation:
-The highlights panel in Lightning Experience is controlled by compact layouts rather than page layouts. To make fields appear in the highlights panel for an object like Account, an administrator must create a custom compact layout in the Object Manager, add the desired fields to it, and assign it as the primary compact layout. Options A and D incorrectly assume the highlights panel is managed via the standard page layout editor, while Option B does not affect the highlights panel.
-
+When a flow is launched by a process (Process Builder/Flow triggered), the most effective way to troubleshoot is to capture platform debug logs and set the “Workflow/Flow” logging level to finest. This shows the flow interview steps, variable values, and faults as it executes under automation.
+A (Flow Builder’s Debug) is great for screen or autolaunched flows you run directly, but it won’t replicate being invoked by a process under another user/context or with record-trigger timing.
+B (Setup Audit Trail) tracks admin changes, not runtime failures.
+C (Email logs) only helps with email delivery issues, not flow logic.
 
 116. Northern Trail Outfitters has requested that when the Referral Date field is
 updated on the custom object Referral Source, the parent object Referral also
@@ -1370,8 +1377,7 @@ Outfitters.
 
 Why are these users unable to access the account object in the Salesforce org?
 
-A. Users’ profile requires permission to the
-Account object.
+A. Users’ profile requires permission to the Account object.
 
 B. Users’ profile requires a sharing rule for Accounts.
 
@@ -1612,18 +1618,6 @@ Answer(s): D
 Explanation: Flow Builder (Option D) is the modern declarative tool used to perform automated field updates and record modifications based on trigger criteria, such as updating a date field when an account status changes. Option A (Formula Field) calculates values dynamically on the fly rather than writing a permanent static date value to a database field. Option B (Validation Rule) checks data for errors and stops saves; it cannot update field values. Option C (Approval Process) is used for routing records through human approval chains, which is far too complex and unnecessary for a simple status-based field update.
 
 
-136. The VP of sales at DreamHouse Realty has requested a dashboard to visualize enterprise sales across the different teams. The key piece of data is the total of all sales for the year and the progress to the enterprise sales goal.
-What dashboard component will effectively show this number and the proximity to the total goal as a single value?
-
-A. Gauge
-B. Donut
-C. Table
-D. Stacked Bar
-
-Answer(s): A
-
-
-Explanation: A Gauge component (Option A) is specifically designed to show a single key value against a total target or goal range, making it ideal for visualizing progress toward an annual sales target. Option B (Donut) shows proportions of a whole across multiple categories. Option C (Table) displays data in rows and columns. Option D (Stacked Bar) compares totals across groups with segmented categories, none of which primarily serve to track a single metric against a set goal range like a gauge.
 
 
 137. Cloud Kicks users are seeing error messages when they use one of their screen flows. The error messages are confusing but could be resolved if the users entered more information on the account before starting the flow.
@@ -1640,18 +1634,6 @@ Answer(s): B
 Explanation: In Flow Builder, a fault connector (Option B) can be used to catch runtime errors (such as unhandled exceptions or failed database operations due to missing data) and route the user to a custom error screen that clearly explains what went wrong and how to correct it. Option A is incorrect because permission sets control feature and object access, not flow runtime errors. Option C is incorrect because hiding error notifications doesn't solve the underlying UX problem. Option D is incorrect because validation rules ensure data integrity and should not be blindly removed.
 
 
-138. Northern Trail Outfitters wants to update data with information from their data warehouse.
-What should an administrator do to accomplish this?
-
-A. Use a unique ID field to match records between the systems.
-B. Use the data loader to match records between the systems.
-C. Use an external ID field to match records between the systems.
-D. Use an external object to match records between the systems.
-
-Answer(s): C
-
-
-Explanation: To upsert data or match existing Salesforce records with external systems like a data warehouse during data loading, an external ID field (Option C)—which is a custom field containing unique record identifiers from an external system—must be used. Option A is incorrect because standard "unique" fields are for internal Salesforce uniqueness constraints, whereas external IDs are specifically meant for cross-system matching. Option B names the tool (Data Loader) rather than the field attribute required for matching. Option D (External object) maps data virtually without storing it locally, but matching records for data updates typically relies on an External ID field configuration.
 
 
 139. A sales rep has a list of 300 accounts with contacts that they want to load at one time.
@@ -1769,8 +1751,7 @@ C. Collaboration groups are created automatically for every department.
 D. Object layouts should be configured to include the groups related list.
 
 Answer(s):
-A. An administrator needs to create a group to enable record sharing.
-D. Object layouts should be configured to include the groups related list.
+B , D
 
 Explanation:
 To use Salesforce Chatter groups for record sharing and collaboration, an administrator must first create a group and enable customer/record sharing settings on it. Additionally, the groups related list needs to be added to the relevant object layouts so users can see which groups are associated with specific records. The "Add Record" action appears automatically when record sharing is enabled on a group, and groups are never created automatically for departments.
@@ -1791,20 +1772,7 @@ Explanation:
 A Validation Rule evaluates a condition upon record save and displays an error if the criteria are not met, making it the perfect tool to enforce that the Budget field is populated whenever someone attempts to change the Lead Status to qualified. Making a field globally required via page layouts or field properties enforces it everywhere rather than specifically targeting the transition to the "qualified" status.
 
 
-148. The VP of sales at Cloud Kicks has a standard sales profile and is receiving an error message that prevents them from saving an opportunity. The administrator attempted the same edit without receiving an error.
 
-How can the administrator troubleshoot this issue?
-
-A. Use an AppExchange product to troubleshoot.
-B. Use ‘Login as’ to log in as the user.
-C. Log in as a system administrator to troubleshoot.
-D. Ask the user for their password so the admin can log in as the user.
-
-Answer(s):
-B. Use ‘Login as’ to log in as the user.
-
-Explanation:
-The best and most secure practice to troubleshoot user-specific errors (which may be caused by custom validation rules, assignment rules, or sharing rules affecting that specific user) is to use the Login as feature to replicate the exact behavior from their perspective. Asking for passwords violates security compliance, and logging in as a system administrator or using AppExchange products would not replicate the user's specific access constraints.
 
 149. Cloud Kicks has a custom object called Shipments. The company wants to see all the shipment items from an Account page. When an Account is deleted, the shipments should remain.
 What type of relationship should the administrator make between Shipments and Accounts?
@@ -1852,80 +1820,6 @@ Explanation:
 Salesforce Bolt Solutions are pre-built templates and solutions on the AppExchange (such as industry-specific portals and automated workflows with calculators) designed to accelerate implementations quickly and cost-effectively, fitting the strict 30-day timeline and budget constraints. Lightning Communities focus on digital experiences, Lightning Data provides external data feeds, and Flow Solutions are focused on standalone automations rather than full end-to-end templated business processes.
 
 
-152. Northern Trail Outfitters has the Case object set to private. The support manager raised a concern that reps have a broader view of data than expected and can see all cases on their group's dashboards.
-What could be causing reps to have inappropriate access to data on dashboards?
-
-A. Dashboard Subscriptions
-B. Public Dashboards
-C. Dashboard Filters
-D. Dashboard’s running user
-
-Answer(s): D. Dashboard’s running user
-
-Explanation:
-
-
-A dashboard displays data based on its running user. If the dashboard's running user is set to a user with elevated permissions (such as a manager or administrator with "View All Data"), then any user viewing that dashboard will see data according to that running user's wide access privileges, bypassing the standard sharing rules of the viewing user.
-
-
-153. The marketing team at Ursa Major Solar wants to send a personalized email whenever a lead fills out the web-to-lead form on their website. They want to send different messages based on the Lead Industry field value.
-What should an administrator configure to meet this requirement?
-
-A. Add a public group and Process Builder to email the lead.
-B. Create an assignment rule to email the lead.
-C. Configure an auto-response rule to email the lead.
-D. Use a validation rule to trigger workflow to email the lead.
-
-Answer(s):
-C. Configure an auto-response rule to email the lead.
-
-Explanation:
-Auto-response rules on Leads can evaluate incoming criteria (such as the Lead Industry field value captured from a Web-to-Lead form) and automatically route different, customized email templates to the lead. Assignment rules handle lead ownership routing rather than personalized conditional email delivery, and validation rules prevent saves rather than sending emails.
-
-
-154. Northern Trail Outfitters has asked an administrator to ensure that when a contact with a title of CEO is created, the contact’s account record gets updated with the CEO’s name.
-Which feature should an administrator use to implement this request?
-
-A. Quick Action
-B. Validation Rule
-C. Workflow Rule
-D. Process Builder
-
-Answer(s):
-D. Process Builder
-
-Explanation:
-Process Builder (or Flow) is required here because standard declarative tools like Workflow Rules can only update fields on the same object or parent master-detail fields. Since this scenario requires updating a parent/related Account record based on a change in a child Contact record, a cross-object field update using Process Builder is necessary.
-
-
-155. The administrator at Ursa Major Solar has created a custom report type and built a report for the sales operations team. However, none of the users are able to access the report.
-Which two options could cause this issue? (Choose two.)
-
-A. The user's profile is missing View access.
-B. The org has reached its limit for custom report types.
-C. The custom report type is in development.
-D. The report is saved in a private folder.
-
-Answer(s):
-A. The user's profile is missing View access.
-D. The report is saved in a private folder.
-
-Explanation: Users cannot access a report if they do not have the proper visibility or permissions. Saving a report in a private folder restricts access solely to the creator unless explicitly shared. Additionally, users or profiles require access permissions to view reports based on folder sharing and report type access. Options B and C are incorrect because reaching custom report type limits prevents creation rather than blocking user access, and "in development" is not a status that prevents users from running a fully built report (unlike custom objects/fields with deployment statuses).
-
-
-156. DreamHouse Realty regularly processes customer requests for warranty work and would like to offer customers a self-serve option to generate cases.
-Which two solutions should an administrator use to meet this request? (Choose two.)
-
-A. Web-to-Case
-B. Case Escalation
-C. Email-to-Case
-D. Case Queues
-
-Answer(s):
-A. Web-to-Case
-C. Email-to-Case
-
-Explanation: Web-to-Case allows customers to submit requests directly through a public website form, and Email-to-Case lets customers send an email that automatically generates a case, both acting as primary self-serve or external-facing entry points for case creation. Options B and D (Case Escalation and Case Queues) are internal routing and automation mechanisms used after the case has already been created, rather than self-serve channels for customers.
 
 
 157. At Ursa Major Solar, a flow is in place that sends a reminder email 30 days before the warranty expiration date. A customer renews their warranty for another three years.
@@ -2964,7 +2858,7 @@ B. Create a new queue and add Cases as an available object.
 C. Add Cases to the existing queue as available object.
 D. Configure a flow to assign the cases to the queue.
 
-Answer(s): B. Create a new queue and add Cases as an available object, C. Add Cases to the existing queue as available object.
+Answer(s): A & C
 
 
 Explanation: To handle cases using a queue, an administrator can either add the Case object to an existing queue if appropriate, or create a new queue specifically designating Cases as a supported object. Both options directly enable the queue to manage cases for the support team.

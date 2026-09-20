@@ -98,7 +98,7 @@ C. Operate your business in at least two different countries
  
 D. You cannot enable this feature once you've implemented Salesforce.
  
-Answer: A
+Answer: A (Now setup -> Company Info. -> Currencies)
  Why: In classic Salesforce administration and legacy exam frameworks, enabling the multi-currency feature required contacting Salesforce Customer Support to activate it for an organization. While modern versions allow administrators to turn on multiple currencies directly in Setup under Company Information, historical questions identify contacting Salesforce as the necessary step. Option B is incorrect because Chatter profiles do not contain organization-wide currency settings, and options C and D are factually incorrect. 
 Timestamp: Sept. 29, 2019, 11:32 p.m.
 
@@ -145,7 +145,7 @@ E. Export List View data to Excel
  
 F. All of the above
  
-Answer: F
+Answer: A, B, C, D
  Why: Salesforce list views support saving custom search criteria for future use, controlling sharing settings to specify which user groups or roles can access them, and printing the formatted list. Additionally, list views allow users to follow records, view Chatter posts, and export view data to external formats such as Excel. Since every option listed represents an actual function or feature of list views, "All of the above" is the correct answer. 
 Timestamp: May 11, 2020, 8:32 p.m.
 
@@ -164,7 +164,7 @@ Answer: C
  Why: A profile in Salesforce defines the core baseline permissions and settings that dictate object access, field-level security, page layouts, and system capabilities for a user. While roles control record-level data visibility through the hierarchy, profiles control what functions users can execute and what parts of the interface they can see. Therefore, a profile is the correct definition for this collection of UI and functional permissions. 
 Timestamp: Dec. 8, 2020, 5:20 p.m.
  
-13. Which of the following is not a standard Profile?
+13. Which of the following are not a standard Profile?
  
 A. System Administrator
  
@@ -327,7 +327,7 @@ B. Pop ups are automatically disabled
  
 C. Their IP address is added to a trusted list
  
-D. They are prompted to answer a security question
+D. They are prompted to answer a security question *(Now not a Que. but Security Code)
  
 Answer: A, D
  Why: When a user logs in for the first time (or from an unrecognized device/browser), two main security steps occur:
@@ -430,7 +430,6 @@ Answer: C
  Why: Organization-Wide Defaults (OWD) set the baseline level of access across the entire company. To ensure that specific users cannot view Account records they do not own, the baseline OWD must be set to Private (C). Once set to Private, access can then be selectively granted to other users who need it via the role hierarchy, sharing rules, or manual sharing. 
 Timestamp: Nov. 22, 2022, 11:25 p.m.
 
-23.08##
 
 31.In a private sharing model, the following can be used when Role Hierarchy alone isn't sufficient when providing record access to users (Choose all that apply.)
  
@@ -444,7 +443,7 @@ D. Teams (Account, Sales and Case)
  
 E. Apex Triggers
  
-Answer: BCDE
+Answer: B, C, D, E
  Why: In a private sharing model, when the Role Hierarchy does not grant the necessary access to records, administrators can use several mechanisms to open up access to specific users or groups:
 Sharing Rules (B): Automatically grant read or read/write access to groups of users based on record ownership or criteria.
 Manual Sharing (C): Allows individual record owners or administrators to share specific records with other users on an ad-hoc basis.
@@ -577,7 +576,7 @@ E. All of the above
  
 F. None of the above
  
-Answer: ABC
+Answer: A, B, C
  Why: System Administrators cannot delete standard fields provided by Salesforce (such as Account Name, Created By, or Opportunity Amount). They can only hide them or remove them from page layouts.
 However, administrators can perform the following customizations on standard fields:
 Change the field label (A): Via Rename Tabs and Labels or Field Customization.
@@ -656,7 +655,7 @@ D. They are not searchable
  
 E. They will not display on reports
  
-Answer: ABD
+Answer: A, B, D
  Explanation
 A. They are read-only: True. Formula fields calculate their values automatically based on other fields, expressions, or values. End-users cannot edit them manually.
 B. They will not display on record edit pages: True. Because formula fields are read-only and dynamically calculated, Salesforce excludes them from the page layout while a user is actively editing a record.
@@ -1013,8 +1012,7 @@ E. Always shows up to date data
  
 F. Can be scheduled to be refreshed and emailed automatically
  
-Answer: CDF
- Answer: A, C, D, F (or C, D, F depending on classic test bank interpretations)
+ Answer: A, C, D, F 
 Breakdown of Options:
 A. Is comprised of up to 20 components: True (in standard Classic/Lightning dashboards, a single dashboard layout supports up to 20 components).
 C. Has a running user to determine what data is visible: True. The dashboard running user determines whose security permissions and data visibility settings are used when rendering component source reports.
@@ -1069,8 +1067,7 @@ C. When a record is created/updated and didn't previously meet the trigger crite
  
 D. None of the above
  
-Answer: B
- Correct Answer: C. When a record is created/updated and didn't previously meet the trigger criteria
+Correct Answer: C. When a record is created/updated and didn't previously meet the trigger criteria
 Scribd
 (Note: Official Salesforce test dumps mark C as the answer because option C paraphrases the native rule evaluation criteria: "created, and any time it's edited to subsequently meet criteria.")
 Why C is Correct:
@@ -1214,7 +1211,7 @@ Why: Auto-Response Rules in Salesforce allow organizations to automatically send
 Timestamp: Oct. 18, 2021, 3:56 p.m.
 
  
-##24.08
+
 76. When Chatter is enabled in an org, the following happens (Choose all that apply).
  
 A. The Chatter app is added to the Force.com app menu
@@ -1676,7 +1673,7 @@ C. Only child fields are available for reporting
  
 D. Lookup field child is required
  
-Answer: A (and D depending on phrasing interpretation, but strictly A is the correct option here)
+Answer: A 
 Why:
 A is True: In a Master-Detail relationship, security and sharing settings are directly inherited from the master (parent) record.
 B is False: When a parent (master) record is deleted, all associated child records are automatically deleted (cascade delete), not manually deleted.
@@ -2097,7 +2094,7 @@ C. Three custom fields
  
 D. Custom lead fields cannot be mapped
  
-Answer: 
+ 
  Answer: C
 Why: Custom lead fields can be mapped to up to three custom fields across different objects during lead conversion: one custom field on the Account, one on the Contact, and one on the Opportunity. This mapping allows data captured on the lead to automatically flow to each created or updated record upon conversion. Therefore, option C correctly identifies the total number of custom target fields a single custom lead field can map to across those three destination objects.
 Timestamp: Dec. 29, 2020, 5:35 p.m.
@@ -2312,8 +2309,9 @@ B. Edit Page
 C. List Views
  
 D. Related Lists
+E. Mini page layout
  
-Answer: C
+Answer: E
  Why: Recent items (in classic interface components/hover cards) and Lookup Hover Views derive the fields they display directly from the primary Search Layout or List View column configurations (specifically, the "Lookup Dialogs" and "Search Results" layouts). In classic layout architectures, lookup preview hovers and quick lists draw from the object's primary Search Layouts/List View definitions. Therefore, List Views govern the fields rendered in hover cards and recent item previews. 
 Timestamp: Dec. 23, 2019, 12:27 a.m.
 
@@ -2379,7 +2377,7 @@ D. Forecasting
  
 E. All of the above
 
- Answer: E. All of the above (or A, B, and C depending on the specific exam attempt configuration)
+ Answer: A, B, and C 
 Why:
 In Salesforce Classic certification tracks (ADM-201), the Company Profile (found under Setup > Company Profile) includes the following settings and capabilities:
 Language, Locale, and Time Zone: Configures the default organization-wide regional and language settings.
@@ -2460,7 +2458,7 @@ D. Data Visibility
  
 E. Hours of IP Address
  
-Answer: A, B, C, and E (or All except Data Visibility / Record-level Data)
+Answer: A, B, C, and E 
 Why: In Salesforce, a Profile controls user permissions, object-level access, and security settings, including:
 Access to Applications (A): Controls which apps appear in the App Menu.
 Record Type Access (B): Controls which record types are available to a user when creating records.
@@ -2544,7 +2542,7 @@ C. You need user to have a Manager Role
  
 D. Click Run Report and choose Schedule Future Runs... from the drop-down button.
  
-Answer: D. Click Run Report and choose Schedule Future Runs... from the drop-down button. (or B. You need user permission to "Schedule Reports")
+Answer: D. Click Run Report and choose Schedule Future Runs... from the drop-down button. 
 Why:
 In classic Salesforce administration (ADM-201):
 Actionable Step (Option D): To initiate the setup screen where you specify the running user, email recipients, frequency (daily/weekly/monthly), start/end dates, and preferred start time, you navigate to the report, click the drop-down next to Run Report, and select Schedule Future Runs...
@@ -2671,7 +2669,7 @@ A. Workflow Task: Assigns a new task to a user, role, or record owner.
 B. Workflow Outbound Message: Sends a secure XML payload message to an external web service or endpoint.
 C. Workflow Field Updates: Automatically updates the value of a field on the record or a related parent record.
 E. Workflow Email Alerts: Sends automated email notifications using a specified template.
-Because D (Workflow Actions) represents the overall umbrella component containing Tasks, Outbound Messages, Field Updates, and Email Alerts, all options listed are valid components.
+
 Timestamp: Aug. 27, 2020, 6:47 p.m.
 
 —-----------------------
@@ -2730,7 +2728,7 @@ C. Enterprise Edition
  
 D. Unlimited Edition
  
- Answer: A. Developer Edition (as well as Enterprise and Unlimited Editions)
+ Answer: A. C, D
 (Note: Depending on the specific legacy test bank key, C. Enterprise Edition or D. Unlimited Edition is sometimes marked as the single correct choice, as Dynamic Dashboards were initially made available for Enterprise, Unlimited, and Developer editions, but excluded from Professional Edition).
 Why:
 In the Spring '11 release, Salesforce introduced Dynamic Dashboards (allowing a single dashboard to display data tailored to the running user's specific access levels).
@@ -3305,7 +3303,6 @@ This is a standard multi-select Salesforce question ("Choose 3 answers") regardi
 B. It allows agents to view key record information in the highlights panel: The Highlights Panel sits at the top of records to display key fields (such as Case Status, Priority, and Contact Info) so agents don't have to scroll.
 C. It preserves the context of calls using primary tabs and subtabs: Primary tabs hold main records (like an Account or Case), while subtabs hold related records (like Contacts or Case Comments), allowing support agents to work on multiple records simultaneously without losing context.
 E. It allows agents to take notes in an interaction log while in a call: The Interaction Log component lets agents log call notes directly from the console interface while on an active customer interaction.
-A. It provides data visibility by combining a list view and related records on one screen: The Console includes split views/pinned list views that allow navigation across records without leaving the main workspace view.
 Why Option D is Incorrect:
 D. It allows access to data by opening each record in a new window: The entire purpose of the Service Cloud Console is to keep agents within a single tabbed workspace window to minimize browser window clutter and context switching.
 Timestamp: Dec. 27, 2020, 3:16 p.m.
@@ -3425,7 +3422,7 @@ Timestamp: Dec. 29, 2020, 2:36 a.m.
 
 
 —---------------------
-236.You can not use the browser's print function to print reports.
+236. You can not use the browser's print function to print reports.
  
 A. True
  
@@ -3709,7 +3706,7 @@ A. True
  
 B. False
  
-B. False
+Answer: B. False
 Why: Standard reports provided out of the box by Salesforce are built-in report templates located within standard report folders. They cannot be found using the global search or the Reports tab search bar. To locate standard reports, users must navigate to the Reports tab and either browse through the standard report folders or use them to create and save a new custom report (which can then be searched). 
 Timestamp: Dec. 29, 2020, 5:01 a.m.
 —--------------------------
@@ -3788,8 +3785,10 @@ B. Marketing Management
 C. Customer Support Management
  
 D. Campaign Management
+
+E. All of the above
  
-Answer: A, B, C, D (All of the above)
+Answer: E (All of the above)
 (Note: If this is a single-select question from a legacy test bank, A. Salesforce Automation is usually listed as the primary answer. However, the full question historically asks to "Select all that apply".)
 Why: Salesforce encompasses all of these core functions across its primary clouds:
 Salesforce Automation (SFA): Core functionality of the Sales Cloud (managing leads, opportunities, and accounts).
@@ -4130,8 +4129,7 @@ C. Customize the campaign member related list on the lead or contact object
  
 D. Create Cross-object formula fields to display lead or contact record details on a campaign member record
  
-Answer: AC
- Answer: B, C (or A, C depending on technical vs. classic practice dump keys)
+Answer: C, D
 Key Context & Breakdown
 C. Customize the campaign member related list on the lead or contact object: (Always Correct) Customizing the Campaign History / Campaign Member related list on Lead and Contact page layouts lets reps immediately see which campaigns (e.g., Trade Show) a prospect is associated with, along with their status (e.g., Responded, Attended).
 B. Alert lead and contact owners with workflow when a prospective customer registers for the event: (Answer Key Choice in classic exam dumps) In historical ADM-201 practice exam answer keys, B and C are marked as the target answers to provide immediate real-time notifications to record owners when event participation changes.
@@ -4150,7 +4148,7 @@ D. Submit an article upon closing a case
  
 E. Publish at-will, with "Manage Articles" profile permission
  
-Answer:  A, D, E (or A, B, D depending on historical exam dump keys)
+Answer:  A, B, D 
 Key Breakdown & Context
 A. Promote an Answer for consideration: (Correct)
 In Salesforce Knowledge and Answers, high-quality community answers can be "promoted" to create a draft knowledge article.
@@ -4229,12 +4227,12 @@ C. Depends on the Users Locale
  
 D. 50.000
  
-Answer: b
+Answer: A
 Why: The Salesforce ISNUMBER() formula function evaluates whether a referenced field or text expression contains a valid numeric value. Because the value 50,000 stored in the custom field Salary__c is numeric, the function evaluates successfully. Therefore, the formula returns TRUE. 
 Timestamp: April 17, 2024, 5:22 p.m.
 —----------------------
 
-319. Which action can be performed on the Campaign Member object? Choose 3 answers
+319. Which action can be performed on the Campaign Member object?
  
 A. Relate a business account to a campaign record
  
@@ -4244,7 +4242,7 @@ C. Create custom lookup field to another object
  
 D. Change a lead to a contact from the campaign member record
  
-Answer: ABC
+Answer: BC
 Why: Salesforce allows business accounts to be added to campaigns as campaign members, and administrators can create custom validation rules on the Campaign Member object. Additionally, custom lookup fields can be added to the Campaign Member object to establish relationships with other standard or custom objects. However, converting or changing a lead to a contact cannot be performed directly from a Campaign Member record.
 Timestamp: July 1, 2020, 3:44 p.m.
 —------------------
@@ -4345,7 +4343,7 @@ D. Call Center
  
 E. Sales Center
  
-Answer: ABD
+Answer: A, D
  Why: Salesforce includes several built-in standard applications out of the box, such as Ideas, Campaigns, and Call Center (historically part of Service features). Options like Administration and Sales Center are not standard application titles in this context. 
 Timestamp: April 17, 2024, 6:36 p.m.
 —-------------------
@@ -4528,7 +4526,7 @@ C. Rules given for group of user working closely on a project
  
 D. Irrelevant for Public Read / Write Organizations
  
-Answer: ABd
+Answer: AB
  Why:A and B are true: Sharing rules are automated mechanisms that extend record access beyond organization-wide defaults (OWD) to specific groups of users, effectively acting as explicit exceptions to restrictive baseline OWD settings.
 D is true: If an object's OWD is set to Public Read/Write, all users already have full read and write access to all records, making sharing rules for that object irrelevant since additional access cannot be granted.
 C is false: Collaboration on specific projects or working closely together across different teams is typically handled via public/private groups, manual sharing, or Salesforce features like Chatter and Teams, rather than standard sharing rules.
@@ -4544,7 +4542,7 @@ C. Associate the new role to Phil's existing profile and Transfer all the accoun
  
 D. None of the above
  
-Answer: D
+Answer: C
  Why: The correct administrative process when an employee changes roles and a replacement is hired involves:
 Creating a new user record (not just a "profile") for the new associate.
 Updating Phil's existing user record with his new role (Senior Sales Exec) and profile.
@@ -4659,6 +4657,7 @@ B. False
 Answer: A 
 Why: Salesforce dashboards use source reports to display visual data representations. Both custom and standard reports can be used as the underlying source reports for dashboard components. 
 Timestamp: April 7, 2020, 6:06 a.m.
+
 —--------------------------------
 384. Which of the following is Not a Mandatory Field while creating a User Record?
  
@@ -4717,7 +4716,7 @@ D. Community
  
 E. Marketing
  
-Answer: D
+Answer: A, D
  Why: Salesforce includes built-in standard applications like Sales, Service, Marketing, and Call Center out of the box. Communities (or Experience Cloud) are used to build external portals and websites rather than functioning as a traditional standard CRM application. 
 Timestamp: Sept. 23, 2019, 3:39 a.m.
 —-----------------------------------------
@@ -4825,7 +4824,7 @@ D. Vlookup
 
 E. None of the above
  
-Answer: None of the above (All options A, B, C, and D are valid functions in Salesforce formula fields). 
+Answer: D
 Why: HyperLink, Substitute, RPad, and Vlookup are all natively supported functions available when creating formula fields in Salesforce. Because every listed option is actually an available function, none of them fit the criteria of being unavailable.
 Salesforce HYPERLINK Function Tutorial This video provides an overview and practical examples of using formula functions like HYPERLINK within Salesforce
 Timestamp: Nov. 14, 2019, 6:37 a.m.
@@ -4860,13 +4859,13 @@ Why: The Data Import Wizard does not support importing Case records, regardless 
  
 A. 100
  
-B. 200
+B. 800
  
 C. 500
  
 D. Unlimited Fields
 
-Answer: C
+Answer: B
 Why: Despite its name, the Salesforce Unlimited Edition has specific structural caps to maintain optimal database performance. For standard and custom objects, the maximum number of custom fields that can be created natively in the Unlimited Edition is 800 (plus up to 100 fields from managed packages for a total hard limit of 900). Therefore, option C (500) is the closest correct option among the choices provided for standard enterprise/unlimited thresholds, or more precisely, 800 custom fields per object. 
 Timestamp: Oct. 21, 2020, 1:52 p.m.
 —------------
@@ -5129,7 +5128,7 @@ D. It can access all that a Chatter Free user can, accounts and contacts and it 
  
 E. It can access all that a Chatter Free user can and it can also access up to 10 custom objects but not standard object.
  
-Answer: B
+Answer: A
 Why: A Chatter Plus (also known as Chatter Only) user license grants access to standard Chatter features alongside specific Salesforce CRM features and objects, including Contents, Ideas, Answers, Accounts, Contacts, Chatter, Groups, People, Profiles tabs, and up to 20 custom objects (note: some legacy documentation or curriculum variants specify these precise object tabs and limits). 
 Timestamp: July 23, 2022, 8:28 p.m.
 —--------------------------------
@@ -5163,7 +5162,7 @@ E. 450
  
 F. 300
  
-Answer: B. 500
+Answer: F
 Why: In Salesforce, a controlling picklist field can have a maximum limit of up to 500 values (with a default limit typically starting at 300, which can be increased upon request to Salesforce Support). 
 Timestamp: July 23, 2022, 8:41 p.m.
 —----------------------------------------
@@ -5375,7 +5374,7 @@ D. Campaign Sharing Rules
  
 E. Custom Object Sharing Rules
  
-Answer: A, B, C, D, E (Case Sharing Rules, Lead Sharing Rules, Solution Sharing Rules, Campaign Sharing Rules, Custom Object Sharing Rules)
+Answer: A, B, D, E 
 Why: In Salesforce, sharing rules can be created for almost all major standard objects (including Cases, Leads, Solutions, Campaigns, Accounts, Opportunities, Contacts) as well as any Custom Objects. Regardless of the specific object, sharing rules themselves are categorized functionally by how they filter data—either as Owner-Based or Criteria-Based sharing rules.
 This Sharing rules in Salesforce video demonstrates how different sharing rules and configurations are applied across various Salesforce objects.
 Timestamp: July 24, 2022, 3:20 p.m.
@@ -5386,7 +5385,7 @@ A. Yes
  
 B. No, once the request is approved only administrator can revoke the approval process
  
-Answer: A
+Answer: B
 Why: In Salesforce, a delegated approver acts on behalf of the original assigned approver during a specified timeframe. This includes the capability to handle requests, approve, reject, or recall/revoke previously acted-upon approval submissions within the process.
 This Salesforce Delegated Approver tutorial covers how delegation functions and how notifications and approvals are managed when users are unavailable
 Timestamp: June 24, 2023, 10:47 a.m.
@@ -5832,7 +5831,7 @@ A. True
  
 B. False
  
-Answer: B 
+Answer: A
 Why: While standard fields cannot be deleted from a standard object entirely, individual standard fields can be removed (dragged off and taken off) from a specific Page Layout in Salesforce. (Note: Certain standard fields, such as "Name" on a detail page or required system fields, may enforce restrictions depending on the object context, but generally standard fields are fully removable from layout configurations).
 Timestamp: April 4, 2025, 7:31 p.m.
 —---------------------
@@ -5850,7 +5849,7 @@ E. Sales (Opportunities)
  
 F. Solutions
  
-Answer: A. Leads, B. Opportunity (or E. Sales / Opportunities), C. Cases, F. Solutions
+Answer: A, B. , C., F., E
 Why:
 In Salesforce, standard business processes (which allow you to customize lifecycles and stage/status picklist values based on user profiles or record types) are uniquely tied to these four standard objects:
 Leads (Lead Process)
@@ -6061,8 +6060,11 @@ A. True
  
 B. False
  
-Answer: B. False
-Why: Workflow rules and workflow email alerts are not supported on Activities (tasks and events) in Salesforce. Activities do not support workflow rules, approval processes, or custom triggers in the same way standard and custom objects do.
+Answer: A True
+Why: Yes, you can send email alerts for workflow rules on Activities (Tasks and Events), with a few considerations:
+Supported: Workflow Rules can be created on the Activity object, and you can attach an Email Alert action. This works for both Tasks and Events when the rule criteria are met.
+Recipients: You can target users, roles, record owners, related users (like Assigned To), or specific email addresses via templates.
+
 Timestamp: Sept. 17, 2019, 3:18 a.m.
 —-------------------------
 708. How many people can you send an invite to at a time using Cloud Scheduler?
@@ -6116,8 +6118,8 @@ B. 3
 C. 4
  
 D. 5
- Answer: D
-Why:In traditional Salesforce certification exams (such as ADM-201), Salesforce recognizes 5 main editions: [1, 2] Currently 6 to 8
+ Answer: D 5 (Currently 6 to 8)
+Why:In traditional Salesforce certification exams (such as ADM-201), Salesforce recognizes 5 main editions (Currently 6 to 8)
 Essentials / Starter
 Professional
 Enterprise
@@ -6190,11 +6192,11 @@ A. 1k
  
 B. 2k
  
-C. 3k
+C. 4k
  
-D. 4k
+D. 5k
  
-Answer: D. 4k
+Answer: D. 5k bytes (about 5 KB) 
 Why: In the context of Salesforce certification exam questions (such as ADM-201), the permitted threshold for the compiled size of a formula field is traditionally evaluated against a 4k ceiling limit option (even though backend system specifications measure compiled execution requirements up to 5,000 bytes).
 Timestamp: Aug. 10, 2020, 7:16 p.m.
 —-------------------------------------
@@ -6277,10 +6279,10 @@ A. 20
  
 B. 50
  
-C. 250
+C. 25
  
 D. 500
- Answer: C. 250
+ Answer: C. 25
 
 
 Why: Your organization's Recycle Bin record limit is calculated as 25 times the Megabytes (MBs) in your general data storage. (Note: In some testing material variations, this is represented factor-wise as 25 times your MB capacity, meaning if options or questions frame it based on specific sizing guidelines, 250 reflects standard formula calculations or multipliers found in platform metrics).
@@ -6316,14 +6318,14 @@ Timestamp: Nov. 13, 2019, 5:45 p.m.
 —-----------------------------------
 771. An administrator has given access to all users to view the public folders in solution with categories. Which permission will enable the user to create more categories?
  
-A. Edit on solution
+A. Manage Categories
  
 B. Create on solution
  
 C. Delete on solution
  
 D. View on solution
-Answer: A. Edit on solution
+Answer: A.  Manage Categories
 Why:
 In Salesforce Classic, object-level permissions dictate capabilities on features like Solutions.
 To create, modify, or add new categories within solution structures, users generally require Edit access permission on the Solution object (along with appropriate administrative management privileges) to manage and structure categories effectively.
@@ -6532,8 +6534,8 @@ A. True
  
 B. False
  
-Answer: A
- Why: "Sales User" (along with profiles like Standard User, System Administrator, and Marketing User) is one of the standard profiles provided out-of-the-box by Salesforce.
+Answer: B
+ Why: "Sales User" (along with profiles like Standard User, System Administrator, and Marketing User) is one of the standard profiles provided out-of-the-box by Salesforce. It’s permission set. 
 
 Timestamp: March 8, 2023, 9:18 a.m.
 —----------------------------
@@ -6589,9 +6591,13 @@ A. True
  
 B. False
  
-Answer: B. False
-Why:
-Reports and dashboards deleted from Salesforce are not sent to the standard Recycle Bin. Instead, they are moved to the "Deleted" folder within the Reports or Dashboards tab, where they can be restored from there within a limited timeframe.
+Answer: A
+Why:Yes—deleted reports go to the Recycle Bin and you can restore them, as long as they haven’t been purged yet.
+Key points:
+Where they go: Deleting a report moves it to your org’s Recycle Bin (soft delete).
+Retention: Items are typically kept for up to 15 days or until the bin hits its size limit, after which Salesforce permanently deletes them.
+Who can restore: The user who deleted the report, a user with access to that user’s Recycle Bin, or an admin with “Modify All Data.”
+
 Timestamp: May 20, 2020, 10:22 a.m.
 —--------------------------
 872. Which of the following statements are true about Import wizard?
@@ -6938,7 +6944,11 @@ B. Contact salesforce.com to enable multiple currencies
 C. Enable Advanced Currency Management
  
 D. Choose a default currency
-Answer: A. Create a Sandbox and D. Choose a default currency (along with checking the "Activate Multiple Currencies" box under Company Information).
+
+Answer:  B and D.
+If a single answer is needed D is correct.
+Contact salesforce.com to enable multiple currencies: Historically required; in many orgs today, admins can enable “Multiple Currencies” in Company Information, but the key gating step is having the feature enabled at the org level before you can configure currencies.
+Choose a default currency: You must set a corporate (default) currency for the org before adding more currencies and exchange rates.
 
 Why:
 
@@ -7173,7 +7183,7 @@ C. Customize the URL assigned to the content delivery.
  
 D. Encrypt certain content delivery files.
  
-Answer: BD
+Answer: A, B
  Why:
 Password Protection (Option B): Content deliveries allow you to apply password protection to secure sensitive or proprietary documents so that unauthenticated external recipients must enter a password to view them.
 Associate with a Salesforce Record (Option D): You can link content deliveries directly to relevant Salesforce records (such as Accounts, Contacts, Opportunities, or Cases) using the Content Deliveries related list.
@@ -7258,7 +7268,7 @@ C. Create new users, and then Freeze the users.
  
 D. Create new users, and uncheck Generate new password, and notify the user immediately.
  
-Answer: c
+Answer: D
  Why:
 Freeze User Accounts: In Salesforce, administrators can create user records ahead of time and immediately click Freeze on the user detail page. This prevents the user from logging in or receiving automated system notification emails while still allowing the administrator to assign records, ownership, list views, and permission sets.
 Why other options are incorrect:
@@ -7403,7 +7413,7 @@ C. The filed is used in a workflow filed update.
  
 D. The filed is used in a report.
  
-Answer: B. The field is part of a field dependency.
+Answer: A, B.
 
 Why:
 
@@ -7488,7 +7498,7 @@ D. Validation rules do not execute when importing data.
  
 E. Unrestricted picklist, a new picklist value will be applied but will not be added to the picklist.
  
-Answer: ABc
+Answer: ABE
  Why:
 Checkbox Formatting (Option A): When mapping values to checkbox fields using Data Loader, you can successfully use boolean indicators like TRUE or FALSE (along with 1 or 0).
 Field-Level Security (Option B): A user's profile and FLS settings dictate which fields they can read or write to during data load operations.
@@ -7654,7 +7664,7 @@ C. Freeze the previous Administrator user.
  
 D. Deactivate the previous Administrator user.
  
-Answer: D
+Answer: C
 Why: Deactivating a user removes their active access and allows the system administrator to transfer their record ownership and reassign the Default Workflow User settings. Simply freezing or deleting the user leaves workflow rules and record ownership unresolved or active.
  
 Timestamp: Feb. 24, 2020, 3:37 a.m.
@@ -7684,7 +7694,7 @@ C. Data Loader, Scheduled Report, Reporting Snapshot
  
 D. Data loader, Reporting Snapshot, Report Export
  
-Answer: A
+Answer: B
 Why: The Data Export Service provides automated scheduled backups (monthly or weekly) of all organization data into a set of CSV files. Reporting Snapshots allow administrators to periodically save tabular report data into custom objects to track historical trends. Einstein Analytics (Analytics Studio) can be integrated to process, store, and analyze backed-up data trends over time.
  
 Timestamp: Jan. 20, 2020, 5:19 a.m.
@@ -7758,7 +7768,7 @@ C. Knowledge article record types
  
 D. Knowledge article types
  
-Answer: D
+Answer: C
 Why: Knowledge article types allow administrators to define distinct structures, custom fields, and layouts for different kinds of content like FAQs and help articles. They control how information is organized and displayed to support agents and customers.
  
 Timestamp: Dec. 27, 2020, 4:58 p.m.
@@ -7790,13 +7800,12 @@ C. User ID and Account ID
  
 D. Contact Email Address and Account ID
  
-Answer: D
-Why: When using the Data Import Wizard to update existing contact records based on email addresses, you can match the records using the Contact Email Address. Additionally, since contacts are tied to accounts in Salesforce, the Account ID (or matching account name/identifier required by the wizard structure) is necessary to properly map and associate the contact data during the update process.
+Answer: B
+Why: Data Import Wizard matches existing Contacts primarily by Name + Account, or by Contact ID if you include it. In your scenario, you’re updating the email address, so you need to identify the correct Contact record. Providing Contact Name and its Account ID reliably matches the existing Contact so the wizard can update the Email field.
+Contact ID + Account ID (A) would also uniquely identify a record, but in typical marketing spreadsheets you don’t have Salesforce record IDs. The question implies using the wizard with standard fields, not IDs.
+User ID (C) is unrelated; that’s for users, not contacts.
+Email + Account ID (D) isn’t a guaranteed unique match because emails can change (that’s what you’re updating) and aren’t the primary key for matching in the wizard.
 
-How to Import Accounts & Contacts w/ Data Import Wizard
-
-This video provides a helpful overview of how to properly configure, map, and run updates for contacts and accounts using the Data Import Wizard.
- 
 Timestamp: July 9, 2020, 10:22 p.m.
 —---------------------------------------
 1089. Ursa Major Solar is bringing a new type of solar panel to market. An Administrator needs to create a Sales Process for this new product.What are three considerations for the Administrator in this scenario? (Choose three.)
@@ -7976,11 +7985,11 @@ C. Schedule a Time-Dependent Workflow to create users in three weeks.
  
 D. Create a .csv file ensuring that IsActive = False, and use the data loader to insert.
  
-Answer: B, D
+Answer: A, D
 
 Why:
 
-B: The Data Import Wizard allows you to create user records in bulk by mapping a file and explicitly ensuring the Active checkbox/field is left unchecked.
+A: The Data Import Wizard allows you to create user records in bulk by mapping a file and explicitly ensuring the Active checkbox/field is left unchecked.
 
 
 D: Using the Data Loader with a CSV file where the IsActive column is set to false allows administrators to insert user records into Salesforce in an inactive state.
@@ -8468,7 +8477,7 @@ C. The active checkbox is unchecked by default.
  
 D. The user was given the delegated administrator group access.
  
-Answer: B, C
+Answer: A, B
 
 Why:
 B (The System Administrator profile is unavailable under the Salesforce Platform license): The Salesforce Platform license is a limited license that does not have access to all standard objects and administrative functions, and it cannot be assigned the full System Administrator profile. To perform full administrative duties, a user must have a full Salesforce license assigned with the System Administrator profile (or appropriate custom permissions).
@@ -8822,92 +8831,112 @@ Answer : B, C
 2
 When a Lead is converted into an Account, Contact, and Opportunity, standard fields are mapped automatically. However, custom fields require manual configuration to ensure d3ata flows through the conversion process. First, the Platform Administrator must create a corresponding custom picklist field on the Contact object (Option B) with the same values as the Lead field. Second, the administrator must go to the Lead Object Manager, select 'Fields & Relationships,' and click Map Lead Fields (Option C). Here, the admin explicitly maps the Lead custom picklist to the newly created Contact custom picklist. Without this mapping, the data will be lost during conversion. Validation rules (Option A) and making the field required (Option D) ensure data exists on the Lead but do not facilitate the transfer of that data to the Contact.
 
-A sales rep has left the company, and a Platform Administrator has been asked to re-assign all their accounts and opportunities to a new sales rep and keep the team as is. Which tool should the administrator use to accomplish this?
+1. A sales rep has left the company, and a Platform Administrator has been asked to re-assign all their accounts and opportunities to a new sales rep and keep the team as is. Which tool should the administrator use to accomplish this?
 A. Mass Transfer Records
 B. Dataloader.io
 C. Data Import Wizard
 D. Data Loader
+
+Answer: A
+
 2. A Platform Administrator at Universal Containers is trying to deactivate a user who has left the company but is unable to do so. What is preventing the administrator from deactivating this user?
 A. The user is part of an active case assignment rule.
 B. The user is part of an Opportunity team.
 C. The user is part of an Account team.
 D. The user is the running user of a dashboard.
+Answer: D
 
 3. A Platform Administrator needs to enable Agentforce for the service team. What is the most critical prerequisite for ensuring the Service Agents have a complete and accurate view of their customers?
 A. Verify Data Cloud is implemented.
 B. Configure a new Service Console layout.
 C. Activate Email-to-Case for the agent.
 D. Create new user profiles for the agent.
+Answer: A
 
 4. Ursa Major Solar classifies its accounts as Silver, Gold, or Platinum Level. When a new case is created for a Silver or Gold partner, it should go to the Regular Support Queue. When an account is Platinum Level, it should automatically go to the Priority Support Queue. What should a Platform Administrator use to achieve this?
 A. Escalation Rules
 B. Assignment Rules
 C. Workflow Rules
 D. Case Rules
+Answer: B
 
 5.Cloud Kicks is working on a rebrand. In which two areas of the Salesforce mobile app can a Platform Administrator customize the branding?
 A. Header background color
 B. Loading page logo
 C. App header color
 D. Record background color
+Answer: A, B
+
 6. A sales manager at DreamHouse Realty wants sales users to have a quick way to view and update the opportunities in their pipeline expected to close in the next 90 days. What should a Platform Administrator do to accomplish this request?
 A. Create a custom report and schedule the sales users to receive it each day as a reminder to update their opportunities.
 B. Enable Sales Console and show users how to open a tab for each opportunity in the pipeline that meets the requirements.
 C. Create a list view on the Opportunity object and recommend users switch the view to Kanban to edit by drag and drop.
 D. Make a new Sales dashboard and add a component that shows all opportunities that meet the criteria.
+Answer: C
+
 7. A Platform Administrator assigned a custom profile based on the Minimum Access named Salesforce profile to a group of new users and assigned them several existing permission sets.
 However, when the users log in, they do not see the Lightning interface. Which action should the administrator take to give the users access to the Lightning interface?
 A. Enable the Enhanced Interface for User Access Policies.
 B. Create a page in Lightning App Builder with the org as default.
 C. Add Lightning component to a layout.
 D. Assign a permission to enable Lightning Experience User.
+Answer: D
 
 8. A Platform Administrator wants to customize the navigation menu for users in the Salesforce mobile app. The organization has not yet implemented any Lightning apps for mobile use. Which statement about the Mobile Only app navigation is correct?
 A. The first four items in the Mobile Only navigation menu appear both in the navigation menu and in the navigation bar at the bottom of the screen.
 B. The Mobile Only app automatically includes all standard Salesforce objects in the navigation menu based on user permissions.
 C. The Mobile Only app can be customized to show different navigation menus for different user profiles and permission sets.
 D. Lightning pages and Visualforce pages automatically appear in the Mobile Only navigation menu without requiring tabs to be created first.
+Answer: A
+
 9. Which task is especially suited for Agentforce?
 A. Tasks without decision-making
 B. Single-step predefined processes
 C. Static document generation
 D. Multi-step processes that need adaption to change
+Answer: D
 
 10. A VP of sales needs to report on records owned by individuals in various parts of the role hierarchy. The organization-wide default is set to Private. What should a Platform Administrator configure to achieve this?
 A. Sharing Rules
 B. Restriction Rules
 C. Field-Level Security
 D. Permission Sets
+Answer: A
 
 11. Which two solutions is a Platform Administrator able to find on AppExchange to enhance their organization?
 A. Communities
 B. Consultants
 C. Customers
 D. Components
+Answer: B,D
 
 12. When a qualified lead is converted, what happens to its related records?
 A. All activities are attached to the resulting contact, account, and opportunity records.
 B. Open activities only are attached to the resulting contact, account, and opportunity records.
 C. Campaign history is attached to the resulting contact, account, and opportunity records.
 D. Records from custom objects are attached to the resulting contact, account, and opportunity records.
+Answer: A
 
 13. The sales reps at Cloud Kicks should be able to report on each other's account and opportunity records with the organization-wide default for Account and Opportunity both set to Private. What should a Platform Administrator do to achieve this?
 A. Create manual sharing to share specific account and opportunity records between the sales reps.
 B. Utilize Apex sharing to programmatically share records between a group of Sales Rep users.
 C. Create an Account and Opportunity report to show any owned by each member of the Sales Team and save the report into a shared report folder.
 D. Create an owner-based sharing rule for Accounts with sharing between a Public Group of Sales Reps and Read Only Opportunity Access.
+Answer: D
 
 14. Cloud Kicks is concerned that not everyone on the sales team is entering key data into accounts and opportunities that they own. Also, the team is concerned that if the key information changes, it does not get updated in Salesforce. A Platform Administrator wants to get a better understanding of their data quality and record completeness. What should the administrator do to accomplish this?
 A. Create a report for Accounts and Opportunities highlighting missing data.
 B. Subscribe the sales reps to a monthly report for accounts and opportunities.
 C. Configure the key fields as required fields on the page layout.
 D. Explore AppExchange for data quality and record completeness solutions.
+Answer: D
+
 15. Agentforce is escalating cases to the support team, but the support team complains they have no context and have to ask the customer to repeat everything. Which configuration issue is the most likely cause of this issue?
 A. The handoff is creating a new case instead of transferring the existing session.
 B. The agent's instructions are preventing the history and context from being saved.
 C. The support team's case page layout is missing the agent history component.
 D. The support team members are missing the Agentforce User permission set.
-
+Answer: c
 
 
 
