@@ -1,8 +1,20 @@
 /**
  * Deterministic Grading Engine for ADM-201 Exam Simulator
+ *
+ * Before comparing, every question's answer key is re-derived from the raw "Answer:"
+ * text captured from the source file, so grading is always checked twice against
+ * what the file actually says.
  */
 
 import { EXAM_CONFIG, TOPIC_LIST } from '../constants/examConfig.js';
+import { normalizeLetters, answerSetsMatch, verifyQuestionKey } from './answerKey.js';
+
+function describeLetters(letters, options) {
+  return normalizeLetters(letters).map((letter) => {
+    const option = (options || []).find((o) => String(o.letter).toUpperCase() === letter);
+    return { letter, text: option ? option.text : '(option not found)' };
+  });
+}
 
 export function gradeExamSession(examQuestions, userAnswers) {
   let rawCorrectCount = 0;
@@ -23,13 +35,14 @@ export function gradeExamSession(examQuestions, userAnswers) {
 
   examQuestions.forEach((q, index) => {
     const qId = q.id;
-    const userSelected = userAnswers[qId] || []; // Array of letters, e.g. ['A'] or ['A', 'C']
-    const correctSelected = (q.correctLetters || []).map(l => l.toUpperCase()).sort();
+    const userSelected = normalizeLetters(userAnswers[qId] || []); // e.g. ['A'] or ['A', 'C']
 
-    // Check equality of selected vs correct arrays
-    const isCorrect = 
-      userSelected.length === correctSelected.length &&
-      userSelected.every(letter => correctSelected.includes(letter.toUpperCase()));
+    // Second pass over the file's stated answer, independent of parse time.
+    const verification = verifyQuestionKey(q);
+    const correctSelected = verification.correctLetters;
+
+    // All-or-nothing set comparison: order and case are irrelevant, the full set is required.
+    const isCorrect = answerSetsMatch(userSelected, correctSelected);
 
     const resultRecord = {
       examIndex: index + 1,
@@ -38,8 +51,14 @@ export function gradeExamSession(examQuestions, userAnswers) {
       options: q.options,
       userAnswers: userSelected,
       userAnswerString: userSelected.length > 0 ? userSelected.join(', ') : 'No answer provided',
+      userAnswerDetails: describeLetters(userSelected, q.options),
       correctLetters: correctSelected,
       correctAnswerString: correctSelected.join(', '),
+      correctAnswerDetails: describeLetters(correctSelected, q.options),
+      sourceAnswerLine: q.rawAnswer || '',
+      answerKeyConfidence: verification.confidence,
+      answerKeyMismatch: verification.mismatch,
+      answerKeyWarning: verification.warning || (q.answerKeyMeta && q.answerKeyMeta.warning) || null,
       explanation: q.explanation || 'No explanation available.',
       categoryId: q.categoryId,
       source: q.source || 'file',

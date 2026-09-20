@@ -1,6 +1,46 @@
 import React, { useState } from 'react';
 import { useExam } from '../context/ExamContext.jsx';
 
+function AnswerBlock({ title, tone, details, emptyLabel }) {
+  const palette =
+    tone === 'correct'
+      ? { wrap: 'bg-emerald-50 border-emerald-200', label: 'text-emerald-800', text: 'text-emerald-900' }
+      : { wrap: 'bg-red-50 border-red-200', label: 'text-red-800', text: 'text-red-900' };
+
+  return (
+    <div className={`p-3 border rounded ${palette.wrap}`}>
+      <span className={`font-bold block mb-1 ${palette.label}`}>{title}</span>
+      {details && details.length > 0 ? (
+        <ul className="space-y-1">
+          {details.map((d) => (
+            <li key={d.letter} className={palette.text}>
+              <span className="font-mono font-bold mr-1.5">{d.letter}.</span>
+              <span>{d.text}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <span className="italic text-slate-500">{emptyLabel}</span>
+      )}
+    </div>
+  );
+}
+
+function SourceAnswerNote({ line, warning }) {
+  if (!line && !warning) return null;
+  return (
+    <div className="text-[11px] text-slate-500 border border-slate-200 rounded px-3 py-2 bg-slate-50">
+      {line && (
+        <div>
+          <span className="font-semibold text-slate-600">Stated in your file: </span>
+          <span className="font-mono text-slate-700">Answer: {line}</span>
+        </div>
+      )}
+      {warning && <div className="mt-1 text-amber-700">{warning}</div>}
+    </div>
+  );
+}
+
 export function ResultsScreen() {
   const { examResults, restartExamWithSamePool, resetToUploadScreen } = useExam();
   const [activeTab, setActiveTab] = useState('incorrect'); // 'incorrect' | 'correct' | 'generated' | 'categories'
@@ -180,15 +220,21 @@ export function ResultsScreen() {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                      <div className="p-3 bg-red-50 border border-red-200 rounded">
-                        <span className="font-bold text-red-800 block mb-1">Your Answer:</span>
-                        <span className="font-mono text-red-900">{q.userAnswerString}</span>
-                      </div>
-                      <div className="p-3 bg-emerald-50 border border-emerald-200 rounded">
-                        <span className="font-bold text-emerald-800 block mb-1">Correct Answer:</span>
-                        <span className="font-mono text-emerald-900">{q.correctAnswerString}</span>
-                      </div>
+                      <AnswerBlock
+                        title="Your Answer:"
+                        tone="incorrect"
+                        details={q.userAnswerDetails}
+                        emptyLabel="No answer provided"
+                      />
+                      <AnswerBlock
+                        title="Correct Answer:"
+                        tone="correct"
+                        details={q.correctAnswerDetails}
+                        emptyLabel={q.correctAnswerString}
+                      />
                     </div>
+
+                    <SourceAnswerNote line={q.sourceAnswerLine} warning={q.answerKeyWarning} />
 
                     {/* Options list for context */}
                     <div className="space-y-1 text-xs pt-2 border-t border-slate-200/80">
@@ -253,10 +299,22 @@ export function ResultsScreen() {
                       {q.question}
                     </div>
 
-                    <div className="p-3 bg-emerald-50 border border-emerald-200 rounded text-xs">
-                      <span className="font-bold text-emerald-800 block mb-1">Correct Answer Confirmed:</span>
-                      <span className="font-mono text-emerald-900">{q.correctAnswerString}</span>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                      <AnswerBlock
+                        title="Your Answer:"
+                        tone="correct"
+                        details={q.userAnswerDetails}
+                        emptyLabel="No answer provided"
+                      />
+                      <AnswerBlock
+                        title="Correct Answer:"
+                        tone="correct"
+                        details={q.correctAnswerDetails}
+                        emptyLabel={q.correctAnswerString}
+                      />
                     </div>
+
+                    <SourceAnswerNote line={q.sourceAnswerLine} warning={q.answerKeyWarning} />
 
                     {/* Explanation */}
                     <div className="p-3 bg-white border border-slate-200 rounded-lg text-xs leading-relaxed text-slate-700">

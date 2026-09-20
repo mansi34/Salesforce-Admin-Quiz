@@ -17,14 +17,17 @@
  * 
  * FORMATTING TOLERANCES SUPPORTED:
  * 1. Numbering: `1. `, `1) `, `Question 1: `, `## 1. `
- * 2. Option Prefixes: `A. `, `a. `, `A) `, `[A] `, `A: `
+ * 2. Option Prefixes: `A. `, `a. `, `A) `, `[A] `, `A: ` (a separator after the letter is required,
+ *    so ordinary prose such as "A user needs..." is never mistaken for an option)
  * 3. Answer Markers: `Answer: `, `Answer(s): `, `Correct Answer: `, `ANS: `
  * 4. Multi-value Answers: `Answer: A, B`, `Answer: A,C`, `Answer(s): A. text, B. text`
- * 5. Explanations: `Why: `, `Explanation: `, `Rationale: `, `Note: `
+ * 5. Explanations: `Why: `, `Explanation: `, `Rationale: `, `Note: `, and free-form headings
+ *    such as `Why B is Correct:` (these end the answer line instead of being absorbed into it)
  * 6. Metadata cleanup: Automatically ignores `Timestamp: ...` and external video/link promotional footers.
  */
 
 import { categorizeQuestion } from './categorizer.js';
+import { deriveAnswerKey } from './answerKey.js';
 
 export function parseQuestionsFromText(rawText) {
   if (!rawText || typeof rawText !== 'string') {
@@ -89,10 +92,18 @@ function parseSingleBlock(blockText, defaultIndex) {
   let explanation = '';
   let state = 'QUESTION'; // 'QUESTION' | 'OPTIONS' | 'ANSWER' | 'EXPLANATION'
 
-  const optionRegex = /^([A-H])[\.\)\:\s\]]\s*(.*)$/i;
+  // A separator after the option letter is mandatory: "A. text", "A) text", "[A] text", "A: text".
+  const optionRegex = /^[\(\[]?([A-H])[\.\)\:\-\]]\s*(.+)$/i;
+  const latinAbbrevRegex = /^(?:e\.g\.|i\.e\.)/i;
   const answerRegex = /^(?:Answer(?:\(s\))?|Correct Answer|ANS)\s*[:\-]\s*(.*)$/i;
   const explanationRegex = /^(?:Why|Explanation|Rationale|Notes?)\s*[:\-]\s*(.*)$/i;
+  // Once the answer line has been read, headings like "Why B is Correct:" also end it.
+  const looseExplanationRegex = /^(?:Why|Explanation|Rationale|Reason|Notes?|Correct)\b[^:\n]{0,80}[:\-]\s*(.*)$/i;
+  // A genuine continuation of a multi-letter answer, e.g. a line holding only "and C".
+  const answerContinuationRegex = /^(?:and|or|[,;&\/+])?\s*[A-H](?:\s*(?:,|;|&|\/|\+|and|or)\s*[A-H])*[\.\,]?$/i;
   const timestampRegex = /^Timestamp\s*:/i;
+
+  const isOptionLine = (text) => optionRegex.test(text) && !latinAbbrevRegex.test(text);
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -116,7 +127,7 @@ function parseSingleBlock(blockText, defaultIndex) {
     }
 
     if (state === 'QUESTION') {
-      if (optionRegex.test(line)) {
+      if (isOptionLine(line)) {
         state = 'OPTIONS';
         const match = line.match(optionRegex);
         options.push({
@@ -127,7 +138,7 @@ function parseSingleBlock(blockText, defaultIndex) {
         questionText += (questionText ? ' ' : '') + line;
       }
     } else if (state === 'OPTIONS') {
-      if (optionRegex.test(line)) {
+      if (isOptionLine(line)) {
         const match = line.match(optionRegex);
         options.push({
           letter: match[1].toUpperCase(),
@@ -140,12 +151,16 @@ function parseSingleBlock(blockText, defaultIndex) {
         }
       }
     } else if (state === 'ANSWER') {
-      if (explanationRegex.test(line)) {
+      if (looseExplanationRegex.test(line)) {
         state = 'EXPLANATION';
-        const match = line.match(explanationRegex);
+        const match = line.match(looseExplanationRegex);
         explanation = match ? match[1].trim() : '';
-      } else {
+      } else if (answerContinuationRegex.test(line)) {
         rawAnswer += ' ' + line;
+      } else {
+        // Anything else after the answer line is rationale, never part of the key.
+        state = 'EXPLANATION';
+        explanation += (explanation ? ' ' : '') + line;
       }
     } else if (state === 'EXPLANATION') {
       explanation += (explanation ? ' ' : '') + line;
@@ -159,65 +174,28 @@ function parseSingleBlock(blockText, defaultIndex) {
     return null;
   }
 
-  // Extract correct option letters
-  // Handles: "B", "B,C", "A, C", "A. Text, D. Text"
-  const correctLetters = extractCorrectLetters(rawAnswer, options);
-
-  if (correctLetters.length === 0) {
-    // If no answer found, default to first option so app does not break
-    correctLetters.push(options[0].letter);
-  }
-
-  // Determine if multi-select
-  const isMultiSelect = correctLetters.length > 1 || 
-    /\(choose\s+(two|three|2|3)\)/i.test(cleanQuestion) || 
-    /\(select\s+(all|two|three|2|3)\)/i.test(cleanQuestion);
+  // Derive the answer key from the file's stated answer (single source of truth).
+  const cleanedRawAnswer = rawAnswer.trim();
+  const answerKey = deriveAnswerKey(cleanedRawAnswer, options, cleanQuestion);
 
   return {
     id: `q_file_${defaultIndex}_${Math.random().toString(36).substr(2, 6)}`,
     originalNumber: defaultIndex,
     question: cleanQuestion,
     options,
-    correctLetters,
-    rawAnswer,
+    correctLetters: answerKey.correctLetters,
+    rawAnswer: cleanedRawAnswer,
     explanation: explanation.trim() || 'No specific explanation provided in source.',
-    isMultiSelect,
-    requiredSelectionCount: correctLetters.length > 1 ? correctLetters.length : (/\(choose\s+three|3\)/i.test(cleanQuestion) ? 3 : (/\(choose\s+two|2\)/i.test(cleanQuestion) ? 2 : 1)),
+    isMultiSelect: answerKey.isMultiSelect,
+    requiredSelectionCount: answerKey.requiredSelectionCount,
+    answerKeyMeta: {
+      method: answerKey.method,
+      confidence: answerKey.confidence,
+      hintedCount: answerKey.hintedCount,
+      warning: answerKey.warning,
+    },
     source: 'file',
   };
-}
-
-/**
- * Parses raw answer string to find matched option letters.
- */
-function extractCorrectLetters(rawAnswer, options) {
-  if (!rawAnswer) return [];
-  const found = new Set();
-
-  const validLetters = new Set(options.map(o => o.letter.toUpperCase()));
-
-  // Pattern 1: Find capital letters followed by comma, dot, or end of word
-  const matches = rawAnswer.match(/\b[A-H]\b/gi);
-  if (matches) {
-    for (const m of matches) {
-      const letter = m.toUpperCase();
-      if (validLetters.has(letter)) {
-        found.add(letter);
-      }
-    }
-  }
-
-  // Pattern 2: If nothing found, check "A,B,C" without spaces
-  if (found.size === 0) {
-    const chars = rawAnswer.replace(/[^A-Ha-h]/g, '').toUpperCase().split('');
-    for (const c of chars) {
-      if (validLetters.has(c)) {
-        found.add(c);
-      }
-    }
-  }
-
-  return Array.from(found).sort();
 }
 
 /**
