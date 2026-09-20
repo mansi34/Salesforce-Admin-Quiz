@@ -7,12 +7,21 @@
  */
 
 import { EXAM_CONFIG, TOPIC_LIST } from '../constants/examConfig.js';
-import { normalizeLetters, answerSetsMatch, verifyQuestionKey } from './answerKey.js';
+import {
+  normalizeLetters,
+  answerSetsMatch,
+  verifyQuestionKey,
+} from './answerKey.js';
 
 function describeLetters(letters, options) {
   return normalizeLetters(letters).map((letter) => {
-    const option = (options || []).find((o) => String(o.letter).toUpperCase() === letter);
-    return { letter, text: option ? option.text : '(option not found)' };
+    const option = (options || []).find(
+      (o) => String(o.letter).toUpperCase() === letter,
+    );
+    return {
+      letter,
+      text: option ? option.text : '(option not found)',
+    };
   });
 }
 
@@ -50,15 +59,24 @@ export function gradeExamSession(examQuestions, userAnswers) {
       question: q.question,
       options: q.options,
       userAnswers: userSelected,
-      userAnswerString: userSelected.length > 0 ? userSelected.join(', ') : 'No answer provided',
+      userAnswerString:
+        userSelected.length > 0
+          ? userSelected.join(', ')
+          : 'No answer provided',
       userAnswerDetails: describeLetters(userSelected, q.options),
       correctLetters: correctSelected,
       correctAnswerString: correctSelected.join(', '),
-      correctAnswerDetails: describeLetters(correctSelected, q.options),
+      correctAnswerDetails: describeLetters(
+        correctSelected,
+        q.options,
+      ),
       sourceAnswerLine: q.rawAnswer || '',
       answerKeyConfidence: verification.confidence,
       answerKeyMismatch: verification.mismatch,
-      answerKeyWarning: verification.warning || (q.answerKeyMeta && q.answerKeyMeta.warning) || null,
+      answerKeyWarning:
+        verification.warning ||
+        (q.answerKeyMeta && q.answerKeyMeta.warning) ||
+        null,
       explanation: q.explanation || 'No explanation available.',
       categoryId: q.categoryId,
       source: q.source || 'file',
@@ -86,11 +104,17 @@ export function gradeExamSession(examQuestions, userAnswers) {
   // Calculate category percentages
   for (const catId of Object.keys(categoryStats)) {
     const stat = categoryStats[catId];
-    stat.percentage = stat.total > 0 ? Math.round((stat.correct / stat.total) * 100) : 0;
+    stat.percentage =
+      stat.total > 0
+        ? Math.round((stat.correct / stat.total) * 100)
+        : 0;
   }
 
-  const totalQuestions = examQuestions.length || EXAM_CONFIG.TOTAL_QUESTIONS;
-  const scorePercent = Number(((rawCorrectCount / totalQuestions) * 100).toFixed(1));
+  const totalQuestions =
+    examQuestions.length || EXAM_CONFIG.TOTAL_QUESTIONS;
+  const scorePercent = Number(
+    ((rawCorrectCount / totalQuestions) * 100).toFixed(1),
+  );
   const isPassed = scorePercent >= EXAM_CONFIG.PASSING_SCORE_PERCENT;
 
   return {

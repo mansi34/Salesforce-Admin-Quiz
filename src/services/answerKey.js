@@ -18,7 +18,15 @@
  */
 
 const VALID_LETTER = /^[A-H]$/;
-const CONNECTOR_WORDS = new Set(['and', 'or', 'plus', 'also', '&', '+', ',']);
+const CONNECTOR_WORDS = new Set([
+  'and',
+  'or',
+  'plus',
+  'also',
+  '&',
+  '+',
+  ',',
+]);
 
 export function normalizeLetters(letters) {
   if (!Array.isArray(letters)) return [];
@@ -63,7 +71,9 @@ const COUNT_WORDS = { one: 1, two: 2, three: 3, four: 4, five: 5 };
 /** Reads "(Choose two)", "Select 2.", "Which three..." from the question text. */
 export function detectRequiredCount(questionText) {
   const text = String(questionText || '');
-  const explicit = text.match(/\b(?:choose|select|pick)\s+(one|two|three|four|five|[1-5])\b/i);
+  const explicit = text.match(
+    /\b(?:choose|select|pick)\s+(one|two|three|four|five|[1-5])\b/i,
+  );
   if (explicit) {
     const token = explicit[1].toLowerCase();
     return COUNT_WORDS[token] || Number(token) || null;
@@ -78,12 +88,17 @@ function parseLetterList(cleaned, validLetters) {
   const body = cleaned.replace(/[\.\s]+$/, '').trim();
   if (!body) return [];
 
-  const tokens = body.split(/\s*(?:,|;|&|\+|\/|\band\b|\bor\b)\s*|\s+/i).filter(Boolean);
+  const tokens = body
+    .split(/\s*(?:,|;|&|\+|\/|\band\b|\bor\b)\s*|\s+/i)
+    .filter(Boolean);
   if (tokens.length === 0) return [];
 
   const letters = [];
   for (const token of tokens) {
-    const letter = token.replace(/[\.\)\:\]\[\(]/g, '').trim().toUpperCase();
+    const letter = token
+      .replace(/[\.\)\:\]\[\(]/g, '')
+      .trim()
+      .toUpperCase();
     if (!VALID_LETTER.test(letter)) return []; // not a pure letter list
     if (validLetters.has(letter)) letters.push(letter);
   }
@@ -97,10 +112,14 @@ function parseLetterList(cleaned, validLetters) {
  */
 function parseLetterWithOptionText(cleaned, options, hintedCount) {
   const optionText = new Map(
-    options.map((o) => [String(o.letter).toUpperCase(), normalizeText(o.text)])
+    options.map((o) => [
+      String(o.letter).toUpperCase(),
+      normalizeText(o.text),
+    ]),
   );
 
-  const markerRegex = /(?:^|[\s,;&\/]|\band\s+|\bor\s+)\(?([A-H])[\.\):\-]\s*/g;
+  const markerRegex =
+    /(?:^|[\s,;&\/]|\band\s+|\bor\s+)\(?([A-H])[\.\):\-]\s*/g;
   const markers = [];
   let match;
   while ((match = markerRegex.exec(cleaned)) !== null) {
@@ -116,8 +135,13 @@ function parseLetterWithOptionText(cleaned, options, hintedCount) {
   const unconfirmed = [];
 
   for (let i = 0; i < markers.length; i++) {
-    const end = i + 1 < markers.length ? markers[i + 1].labelStart : cleaned.length;
-    const segment = normalizeText(cleaned.slice(markers[i].textStart, end));
+    const end =
+      i + 1 < markers.length
+        ? markers[i + 1].labelStart
+        : cleaned.length;
+    const segment = normalizeText(
+      cleaned.slice(markers[i].textStart, end),
+    );
     const expected = optionText.get(markers[i].letter);
     if (expected === undefined) continue;
 
@@ -127,8 +151,16 @@ function parseLetterWithOptionText(cleaned, options, hintedCount) {
       continue;
     }
 
-    const compareLength = Math.min(segment.length, expected.length, 40);
-    if (compareLength >= 3 && segment.slice(0, compareLength) === expected.slice(0, compareLength)) {
+    const compareLength = Math.min(
+      segment.length,
+      expected.length,
+      40,
+    );
+    if (
+      compareLength >= 3 &&
+      segment.slice(0, compareLength) ===
+        expected.slice(0, compareLength)
+    ) {
       confirmed.push(markers[i].letter);
     } else {
       unconfirmed.push(markers[i].letter);
@@ -137,7 +169,11 @@ function parseLetterWithOptionText(cleaned, options, hintedCount) {
 
   // The question demands N answers and we verified fewer: recover the remaining
   // letters from the markers we saw but could not text-match.
-  if (hintedCount && confirmed.length > 0 && confirmed.length < hintedCount) {
+  if (
+    hintedCount &&
+    confirmed.length > 0 &&
+    confirmed.length < hintedCount
+  ) {
     for (const letter of unconfirmed) {
       if (confirmed.length >= hintedCount) break;
       if (!confirmed.includes(letter)) confirmed.push(letter);
@@ -165,7 +201,8 @@ function scanLeadingLetters(cleaned, validLetters) {
   let match;
   while ((match = regex.exec(head)) !== null) {
     const letter = match[1];
-    if (validLetters.has(letter) && !found.includes(letter)) found.push(letter);
+    if (validLetters.has(letter) && !found.includes(letter))
+      found.push(letter);
   }
   return found;
 }
@@ -177,9 +214,15 @@ function scanLeadingLetters(cleaned, validLetters) {
  *            hintedCount: number|null, requiredSelectionCount: number, isMultiSelect: boolean,
  *            warning: string|null}}
  */
-export function deriveAnswerKey(rawAnswer, options, questionText = '') {
+export function deriveAnswerKey(
+  rawAnswer,
+  options,
+  questionText = '',
+) {
   const safeOptions = Array.isArray(options) ? options : [];
-  const validLetters = new Set(safeOptions.map((o) => String(o.letter).toUpperCase()));
+  const validLetters = new Set(
+    safeOptions.map((o) => String(o.letter).toUpperCase()),
+  );
   const cleaned = cleanAnswerText(rawAnswer);
   const hintedCount = detectRequiredCount(questionText);
 
@@ -187,7 +230,11 @@ export function deriveAnswerKey(rawAnswer, options, questionText = '') {
   let method = 'none';
   let confidence = 'none';
 
-  const withText = parseLetterWithOptionText(cleaned, safeOptions, hintedCount);
+  const withText = parseLetterWithOptionText(
+    cleaned,
+    safeOptions,
+    hintedCount,
+  );
   if (withText.length > 0) {
     letters = withText;
     method = 'letter+option-text';
@@ -221,7 +268,9 @@ export function deriveAnswerKey(rawAnswer, options, questionText = '') {
     }
   }
 
-  letters = normalizeLetters(letters).filter((l) => validLetters.has(l));
+  letters = normalizeLetters(letters).filter((l) =>
+    validLetters.has(l),
+  );
 
   // A low-confidence scan that produced several letters for a question with no
   // "choose two/three" instruction is almost always noise: keep the first letter.
@@ -236,7 +285,8 @@ export function deriveAnswerKey(rawAnswer, options, questionText = '') {
     }
     method = 'fallback-first-option';
     confidence = 'none';
-    warning = 'No answer could be read from the source file for this question.';
+    warning =
+      'No answer could be read from the source file for this question.';
   } else if (hintedCount && hintedCount !== letters.length) {
     warning = `The question asks for ${hintedCount} answer(s) but the file states ${letters.length}. The file was used.`;
   }
@@ -260,17 +310,35 @@ export function deriveAnswerKey(rawAnswer, options, questionText = '') {
  * was stored at parse time. The file always wins.
  */
 export function verifyQuestionKey(question) {
-  const stored = normalizeLetters(question && question.correctLetters);
+  const stored = normalizeLetters(
+    question && question.correctLetters,
+  );
 
-  if (!question || !question.rawAnswer || !Array.isArray(question.options)) {
-    return { correctLetters: stored, rechecked: false, mismatch: false, confidence: 'none', method: 'stored' };
+  if (
+    !question ||
+    !question.rawAnswer ||
+    !Array.isArray(question.options)
+  ) {
+    return {
+      correctLetters: stored,
+      rechecked: false,
+      mismatch: false,
+      confidence: 'none',
+      method: 'stored',
+    };
   }
 
-  const derived = deriveAnswerKey(question.rawAnswer, question.options, question.question);
+  const derived = deriveAnswerKey(
+    question.rawAnswer,
+    question.options,
+    question.question,
+  );
   const mismatch = !answerSetsMatch(stored, derived.correctLetters);
 
   // Only override the stored key when the re-derivation is confident.
-  const useDerived = mismatch && (derived.confidence === 'high' || stored.length === 0);
+  const useDerived =
+    mismatch &&
+    (derived.confidence === 'high' || stored.length === 0);
 
   return {
     correctLetters: useDerived ? derived.correctLetters : stored,

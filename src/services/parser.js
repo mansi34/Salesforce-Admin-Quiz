@@ -1,20 +1,20 @@
 /**
  * Markdown & Plain Text Question Parser for ADM-201 Dumps
- * 
+ *
  * EXPECTED INPUT SCHEMA:
  * -------------------------------------------------------------
  * The parser expects plain-text or markdown format questions with the following general structure:
- * 
+ *
  * [Question Number]. [Question Text] [(Optional: Choose two/three)]
- * 
+ *
  * A. [Option Text]
  * B. [Option Text]
  * C. [Option Text]
  * D. [Option Text]
- * 
+ *
  * Answer: [Option Letter(s), e.g. B or A,C or Answer(s): A. Description, B. Description]
  * Why: [Detailed Explanation Text] (or Explanation: [Text])
- * 
+ *
  * FORMATTING TOLERANCES SUPPORTED:
  * 1. Numbering: `1. `, `1) `, `Question 1: `, `## 1. `
  * 2. Option Prefixes: `A. `, `a. `, `A) `, `[A] `, `A: ` (a separator after the letter is required,
@@ -35,7 +35,9 @@ export function parseQuestionsFromText(rawText) {
   }
 
   // Normalize line endings
-  const cleanText = rawText.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  const cleanText = rawText
+    .replace(/\r\n/g, '\n')
+    .replace(/\r/g, '\n');
 
   // Split content into question blocks
   // Questions typically start with number followed by dot/parenthesis at start of line
@@ -44,7 +46,8 @@ export function parseQuestionsFromText(rawText) {
   const blocks = [];
   let currentBlockLines = [];
 
-  const questionHeaderRegex = /^(\s*#{1,4}\s*)?(\bQuestion\s+)?(\d+)[\.\)\:]\s+/i;
+  const questionHeaderRegex =
+    /^(\s*#{1,4}\s*)?(\bQuestion\s+)?(\d+)[\.\)\:]\s+/i;
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -83,7 +86,10 @@ export function parseQuestionsFromText(rawText) {
  * Parses an individual question text block into a structured Question object.
  */
 function parseSingleBlock(blockText, defaultIndex) {
-  const lines = blockText.split('\n').map(l => l.trim()).filter(Boolean);
+  const lines = blockText
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean);
   if (lines.length < 2) return null;
 
   let questionText = '';
@@ -95,15 +101,20 @@ function parseSingleBlock(blockText, defaultIndex) {
   // A separator after the option letter is mandatory: "A. text", "A) text", "[A] text", "A: text".
   const optionRegex = /^[\(\[]?([A-H])[\.\)\:\-\]]\s*(.+)$/i;
   const latinAbbrevRegex = /^(?:e\.g\.|i\.e\.)/i;
-  const answerRegex = /^(?:Answer(?:\(s\))?|Correct Answer|ANS)\s*[:\-]\s*(.*)$/i;
-  const explanationRegex = /^(?:Why|Explanation|Rationale|Notes?)\s*[:\-]\s*(.*)$/i;
+  const answerRegex =
+    /^(?:Answer(?:\(s\))?|Correct Answer|ANS)\s*[:\-]\s*(.*)$/i;
+  const explanationRegex =
+    /^(?:Why|Explanation|Rationale|Notes?)\s*[:\-]\s*(.*)$/i;
   // Once the answer line has been read, headings like "Why B is Correct:" also end it.
-  const looseExplanationRegex = /^(?:Why|Explanation|Rationale|Reason|Notes?|Correct)\b[^:\n]{0,80}[:\-]\s*(.*)$/i;
+  const looseExplanationRegex =
+    /^(?:Why|Explanation|Rationale|Reason|Notes?|Correct)\b[^:\n]{0,80}[:\-]\s*(.*)$/i;
   // A genuine continuation of a multi-letter answer, e.g. a line holding only "and C".
-  const answerContinuationRegex = /^(?:and|or|[,;&\/+])?\s*[A-H](?:\s*(?:,|;|&|\/|\+|and|or)\s*[A-H])*[\.\,]?$/i;
+  const answerContinuationRegex =
+    /^(?:and|or|[,;&\/+])?\s*[A-H](?:\s*(?:,|;|&|\/|\+|and|or)\s*[A-H])*[\.\,]?$/i;
   const timestampRegex = /^Timestamp\s*:/i;
 
-  const isOptionLine = (text) => optionRegex.test(text) && !latinAbbrevRegex.test(text);
+  const isOptionLine = (text) =>
+    optionRegex.test(text) && !latinAbbrevRegex.test(text);
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -168,7 +179,9 @@ function parseSingleBlock(blockText, defaultIndex) {
   }
 
   // Clean leading question number from questionText
-  const cleanQuestion = questionText.replace(/^(\s*#{1,4}\s*)?(\bQuestion\s+)?(\d+)[\.\)\:]\s*/i, '').trim();
+  const cleanQuestion = questionText
+    .replace(/^(\s*#{1,4}\s*)?(\bQuestion\s+)?(\d+)[\.\)\:]\s*/i, '')
+    .trim();
 
   if (!cleanQuestion || options.length < 2) {
     return null;
@@ -176,7 +189,11 @@ function parseSingleBlock(blockText, defaultIndex) {
 
   // Derive the answer key from the file's stated answer (single source of truth).
   const cleanedRawAnswer = rawAnswer.trim();
-  const answerKey = deriveAnswerKey(cleanedRawAnswer, options, cleanQuestion);
+  const answerKey = deriveAnswerKey(
+    cleanedRawAnswer,
+    options,
+    cleanQuestion,
+  );
 
   return {
     id: `q_file_${defaultIndex}_${Math.random().toString(36).substr(2, 6)}`,
@@ -185,7 +202,9 @@ function parseSingleBlock(blockText, defaultIndex) {
     options,
     correctLetters: answerKey.correctLetters,
     rawAnswer: cleanedRawAnswer,
-    explanation: explanation.trim() || 'No specific explanation provided in source.',
+    explanation:
+      explanation.trim() ||
+      'No specific explanation provided in source.',
     isMultiSelect: answerKey.isMultiSelect,
     requiredSelectionCount: answerKey.requiredSelectionCount,
     answerKeyMeta: {
