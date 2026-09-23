@@ -1,5 +1,16 @@
-import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
-import { EXAM_CONFIG, EXAM_STATES, TOPIC_LIST } from '../constants/examConfig.js';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+} from 'react';
+import {
+  EXAM_CONFIG,
+  EXAM_STATES,
+  TOPIC_LIST,
+} from '../constants/examConfig.js';
 import { parseQuestionsAsync } from '../services/parser.js';
 import { buildBalancedExamSet } from '../services/generator.js';
 import { gradeExamSession } from '../services/grader.js';
@@ -20,12 +31,28 @@ export function ExamProvider({ children }) {
   // Active exam session state
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState({}); // { [qId]: ['A', 'C'] }
-  const [timeRemaining, setTimeRemaining] = useState(EXAM_CONFIG.TIME_LIMIT_SECONDS);
+  const [timeRemaining, setTimeRemaining] = useState(
+    EXAM_CONFIG.TIME_LIMIT_SECONDS,
+  );
   const [pauseUsed, setPauseUsed] = useState(false);
   const [examResults, setExamResults] = useState(null);
 
   // Timer interval ref
   const timerRef = useRef(null);
+
+  // The countdown's auto-submit closure is created once, when the exam starts.
+  // Reading the live answers through refs stops it grading an empty snapshot.
+  const userAnswersRef = useRef({});
+  const examQuestionsRef = useRef([]);
+  const hasSubmittedRef = useRef(false);
+
+  useEffect(() => {
+    userAnswersRef.current = userAnswers;
+  }, [userAnswers]);
+
+  useEffect(() => {
+    examQuestionsRef.current = examQuestions;
+  }, [examQuestions]);
 
   // Handle countdown timer
   useEffect(() => {
@@ -55,40 +82,50 @@ export function ExamProvider({ children }) {
   }, [examState]);
 
   // Load and parse file content
-  const loadFileContent = useCallback(async (rawText, fileName = 'Uploaded File') => {
-    try {
-      setIsParsing(true);
-      setParseProgress(20);
-      setParseError(null);
+  const loadFileContent = useCallback(
+    async (rawText, fileName = 'Uploaded File') => {
+      try {
+        setIsParsing(true);
+        setParseProgress(20);
+        setParseError(null);
 
-      const parsed = await parseQuestionsAsync(rawText, (p) => setParseProgress(p));
-      
-      if (!parsed || parsed.length === 0) {
-        throw new Error("Unable to parse valid questions. Please ensure the file matches the expected question/answer format.");
+        const parsed = await parseQuestionsAsync(rawText, (p) =>
+          setParseProgress(p),
+        );
+
+        if (!parsed || parsed.length === 0) {
+          throw new Error(
+            'Unable to parse valid questions. Please ensure the file matches the expected question/answer format.',
+          );
+        }
+
+        setAllParsedQuestions(parsed);
+
+        // Build balanced 60-question set
+        const { examQuestions: balancedSet, breakdown } =
+          buildBalancedExamSet(parsed, TOPIC_LIST);
+
+        setExamQuestions(balancedSet);
+        setCategoryBreakdown(breakdown);
+        setUserAnswers({});
+        userAnswersRef.current = {};
+        hasSubmittedRef.current = false;
+        setCurrentQuestionIndex(0);
+        setTimeRemaining(EXAM_CONFIG.TIME_LIMIT_SECONDS);
+        setPauseUsed(false);
+        setExamResults(null);
+
+        setExamState(EXAM_STATES.CONFIRMED);
+      } catch (err) {
+        console.error(err);
+        setParseError(err.message || 'Failed to parse file.');
+      } finally {
+        setIsParsing(false);
+        setParseProgress(0);
       }
-
-      setAllParsedQuestions(parsed);
-
-      // Build balanced 60-question set
-      const { examQuestions: balancedSet, breakdown } = buildBalancedExamSet(parsed, TOPIC_LIST);
-
-      setExamQuestions(balancedSet);
-      setCategoryBreakdown(breakdown);
-      setUserAnswers({});
-      setCurrentQuestionIndex(0);
-      setTimeRemaining(EXAM_CONFIG.TIME_LIMIT_SECONDS);
-      setPauseUsed(false);
-      setExamResults(null);
-
-      setExamState(EXAM_STATES.CONFIRMED);
-    } catch (err) {
-      console.error(err);
-      setParseError(err.message || "Failed to parse file.");
-    } finally {
-      setIsParsing(false);
-      setParseProgress(0);
-    }
-  }, []);
+    },
+    [],
+  );
 
   // Confirm start of exam
   const confirmAndStartExam = useCallback(() => {
@@ -97,28 +134,33 @@ export function ExamProvider({ children }) {
   }, [examQuestions]);
 
   // Record option selection for current question
-  const selectOption = useCallback((questionId, optionLetter, isMultiSelect) => {
-    setUserAnswers((prev) => {
-      const currentSelected = prev[questionId] || [];
-      let nextSelected;
+  const selectOption = useCallback(
+    (questionId, optionLetter, isMultiSelect) => {
+      setUserAnswers((prev) => {
+        const currentSelected = prev[questionId] || [];
+        let nextSelected;
 
-      if (isMultiSelect) {
-        if (currentSelected.includes(optionLetter)) {
-          nextSelected = currentSelected.filter((l) => l !== optionLetter);
+        if (isMultiSelect) {
+          if (currentSelected.includes(optionLetter)) {
+            nextSelected = currentSelected.filter(
+              (l) => l !== optionLetter,
+            );
+          } else {
+            nextSelected = [...currentSelected, optionLetter].sort();
+          }
         } else {
-          nextSelected = [...currentSelected, optionLetter].sort();
+          // Single select (radio behavior)
+          nextSelected = [optionLetter];
         }
-      } else {
-        // Single select (radio behavior)
-        nextSelected = [optionLetter];
-      }
 
-      return {
-        ...prev,
-        [questionId]: nextSelected,
-      };
-    });
-  }, []);
+        return {
+          ...prev,
+          [questionId]: nextSelected,
+        };
+      });
+    },
+    [],
+  );
 
   // Navigate to next question or submit if last
   const goToNextQuestion = useCallback(() => {
@@ -146,11 +188,16 @@ export function ExamProvider({ children }) {
 
   // Deterministic final submission & grading
   const finalizeExamSubmission = useCallback(() => {
+    if (hasSubmittedRef.current) return;
+    hasSubmittedRef.current = true;
     if (timerRef.current) clearInterval(timerRef.current);
-    const results = gradeExamSession(examQuestions, userAnswers);
+    const results = gradeExamSession(
+      examQuestionsRef.current,
+      userAnswersRef.current,
+    );
     setExamResults(results);
     setExamState(EXAM_STATES.COMPLETED);
-  }, [examQuestions, userAnswers]);
+  }, []);
 
   const handleAutoSubmit = useCallback(() => {
     finalizeExamSubmission();
@@ -158,10 +205,15 @@ export function ExamProvider({ children }) {
 
   // Reset exam for new attempt
   const restartExamWithSamePool = useCallback(() => {
-    const { examQuestions: newSet, breakdown } = buildBalancedExamSet(allParsedQuestions, TOPIC_LIST);
+    const { examQuestions: newSet, breakdown } = buildBalancedExamSet(
+      allParsedQuestions,
+      TOPIC_LIST,
+    );
     setExamQuestions(newSet);
     setCategoryBreakdown(breakdown);
     setUserAnswers({});
+    userAnswersRef.current = {};
+    hasSubmittedRef.current = false;
     setCurrentQuestionIndex(0);
     setTimeRemaining(EXAM_CONFIG.TIME_LIMIT_SECONDS);
     setPauseUsed(false);
@@ -175,6 +227,8 @@ export function ExamProvider({ children }) {
     setExamQuestions([]);
     setAllParsedQuestions([]);
     setUserAnswers({});
+    userAnswersRef.current = {};
+    hasSubmittedRef.current = false;
     setCurrentQuestionIndex(0);
     setTimeRemaining(EXAM_CONFIG.TIME_LIMIT_SECONDS);
     setPauseUsed(false);
@@ -205,13 +259,17 @@ export function ExamProvider({ children }) {
     resetToUploadScreen,
   };
 
-  return <ExamContext.Provider value={value}>{children}</ExamContext.Provider>;
+  return (
+    <ExamContext.Provider value={value}>
+      {children}
+    </ExamContext.Provider>
+  );
 }
 
 export function useExam() {
   const context = useContext(ExamContext);
   if (!context) {
-    throw new Error("useExam must be used within an ExamProvider");
+    throw new Error('useExam must be used within an ExamProvider');
   }
   return context;
 }

@@ -7,6 +7,7 @@ B. When the record is saved/updated
 C. When the return key is pressed
  
 D. None of the above
+
 Answer: B
 Why: Inline editing allows users to modify field values directly within a record or list view, but changes are not committed to the database immediately. The field updates in the system only when the user saves or updates the entire record. Until this save action occurs, the modifications remain in a pending state and do not take effect.
  
@@ -5231,13 +5232,18 @@ Why: In Salesforce, the standard relationship between an Opportunity and Opportu
 Timestamp: Sept. 10, 2021, 4:36 a.m.
 —------------------------------
 2. If a company opts to use Custom Fiscal Years, they cannot use the standard forecasting option.
-A. True Most Voted
+A. True 
 B. False
+
+Answer: A True
+
 12. A _________ defines a collection of settings and permissions that determines what users can see in the user interface, and what they can do.
 A. Role
 B. Chatter feed
-C. Profile Most Voted
+C. Profile 
 D. Company Profile
+
+Answer: C Profile
 
 501. Which of the following needs to be specified in order to schedule a report?
  
@@ -5591,7 +5597,7 @@ A. True
  
 B. False
  
-Answer: ATrue
+Answer: A True
 Why: In Salesforce reports, Custom Summary Formulas are allowed to reference custom formula fields (as well as standard number, currency, and percent fields) that exist within the report's data blocks, provided those underlying fields yield numeric values.
 Timestamp: April 13, 2020, 7:19 a.m.
 —-------------------------------------

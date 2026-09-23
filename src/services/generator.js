@@ -1572,6 +1572,10 @@ export function buildBalancedExamSet(parsedQuestions, topicList) {
   }
 
   for (const q of parsedQuestions) {
+    // A question whose answer could not be read from the file is never asked;
+    // the shortfall is backfilled below so the section still reaches its target.
+    if (q.isGradable === false) continue;
+
     const catId =
       q.categoryId || TOPIC_CATEGORIES.CONFIGURATION_AND_SETUP.id;
     if (categoryPools[catId]) {

@@ -122,6 +122,54 @@ check(
   ['E'],
 );
 
+// "Answer: A True" / "Answer: C Profile" — a letter, a space, then the option
+// text with no dot. Only an exact text match confirms it.
+const trueFalseOptions = [
+  { letter: 'A', text: 'True' },
+  { letter: 'B', text: 'False' },
+];
+check(
+  'letter, space, option text "A True" -> A',
+  deriveAnswerKey('A True', trueFalseOptions, '').correctLetters,
+  ['A'],
+);
+check(
+  'letter, space, option text "C Profile" -> C',
+  deriveAnswerKey(
+    'C Profile',
+    [
+      { letter: 'A', text: 'Role' },
+      { letter: 'B', text: 'Chatter feed' },
+      { letter: 'C', text: 'Profile' },
+      { letter: 'D', text: 'Company Profile' },
+    ],
+    '',
+  ).correctLetters,
+  ['C'],
+);
+// A letter followed by prose that matches no option is a last-resort guess.
+// It is still used, but flagged so the results screen can warn about it.
+const proseAnswer = deriveAnswerKey(
+  'A user must first enable the feature',
+  trueFalseOptions,
+  '',
+);
+check(
+  'prose after a letter falls back to the leading letter',
+  proseAnswer.correctLetters,
+  ['A'],
+);
+check(
+  'that fallback is flagged low confidence',
+  proseAnswer.confidence,
+  'low',
+);
+check(
+  'that fallback carries a warning for the results screen',
+  Boolean(proseAnswer.warning),
+  true,
+);
+
 /* ------------------------------------------------------------------ */
 console.log(
   '\n2) End-to-end parse and grade (multi-answer question)\n',
@@ -240,6 +288,219 @@ check(
 );
 
 /* ------------------------------------------------------------------ */
+console.log('\n2b) Source formats that used to be graded wrong\n');
+
+// Every answer line below is written exactly the way it appears in the
+// uploaded Admin-201 files. Q41 deliberately has no space after "41." and Q42
+// deliberately uses the "Certified Correct Answer:" label.
+const trickyFile = `
+40. If a user has public read-only access to records they do not own, the following are true.
+
+A. The user can view the record but not edit it
+B. The user can view and delete the record, but not edit it
+C. The user can change the owner of the record
+D. The user can search for the record
+E. The user can report on the record
+Answer: ADE
+Why: Public Read-Only allows viewing, searching and reporting, but not editing, deleting or transferring.
+Timestamp: May 1, 2023, 6:36 p.m.
+
+41.Which of the following can be used to create a back up of data from Salesforce?
+
+A. Weekly Data Export
+B. Data Loader
+C. Change Sets
+D. Reports
+E. Sandbox refresh
+Answer: A, B, D (Weekly Data Export, Data Loader, Reports)
+Why: These three extract record data. Change sets move metadata and a sandbox refresh is not a backup.
+
+42. Northern Trail Outfitters has a custom quick action on Account that creates a new Case.
+How should an administrator make the quick action available on the Salesforce mobile app?
+
+A. Include the action in the Salesforce Mobile Navigation menu.
+B. Create a custom Lightning App with the action.
+C. Add the Salesforce Mobile and Lightning Experience action to the page layout.
+D. Modify compact Case page layout to include the action.
+#t June 20, 2024, 12:45 a.m.
+Certified Correct Answer: C. Add the Salesforce Mobile and Lightning Experience action to the page layout.
+Trainer Explanation & Concept: A quick action only appears in the mobile action bar once it is added to the Salesforce Mobile and Lightning Experience Actions section of the page layout.
+
+43. What needs to be specified to schedule a Report?
+
+A. The report folder
+B. The running user
+C. The dashboard component
+D. The frequency and time frame
+Answer: B and D.
+Why: A scheduled report runs as a specific running user on a defined frequency.
+
+44. Which of the following settings affect how Date fields are displayed?
+
+A. Locale
+B. Language
+C. Time Zone
+D. Currency
+Answer:
+
+45. A user has been locked out after several failed login attempts.
+
+Which two ways should the administrator help the user log in? (Choose two.)
+
+A. Log in as the user to unlock the user and reset the password.
+B. Reset password on the user's record detail page.
+C. Use the unlock button on the user's record detail page.
+D. Reset the password policies to allow the user to login.
+
+Answer(s):
+B. Reset password on the user's record detail page.
+C. Use the unlock button on the user's record detail page.
+
+Explanation: An administrator can unlock the user directly or reset the password from the user's record detail page.
+
+46. Custom Summary Formulas can run calculations on custom formula fields.
+
+A. True
+B. False
+Answer: ATrue
+Why: Custom Summary Formulas may reference custom formula fields that return numeric values.
+`;
+
+const tricky = parseQuestionsFromText(trickyFile);
+const byStart = (prefix) =>
+  tricky.find((q) => q.question.startsWith(prefix));
+
+check(
+  'a question header with no space after the number still starts a new question',
+  tricky.length,
+  7,
+);
+
+const runTogether = byStart('If a user has public read-only');
+check(
+  'run-together letters "ADE" -> A,D,E (used to be A)',
+  runTogether.correctLetters,
+  ['A', 'D', 'E'],
+);
+check(
+  'the next question no longer overwrites this answer',
+  runTogether.rawAnswer,
+  'ADE',
+);
+
+const withNote = byStart('Which of the following can be used to');
+check(
+  'letters followed by a note "A, B, D (…)" -> A,B,D (used to be A)',
+  withNote.correctLetters,
+  ['A', 'B', 'D'],
+);
+check(
+  'a merged question keeps its own five options',
+  withNote.options.length,
+  5,
+);
+
+const certified = byStart('Northern Trail Outfitters');
+check(
+  '"Certified Correct Answer: C. …" is read -> C (used to be A)',
+  certified.correctLetters,
+  ['C'],
+);
+check(
+  '"Trainer Explanation & Concept:" is captured as the explanation',
+  certified.explanation.startsWith('A quick action only appears'),
+  true,
+);
+check(
+  'the "#t <date>" footer is not glued onto an option',
+  certified.options[3].text,
+  'Modify compact Case page layout to include the action.',
+);
+
+const andForm = byStart('What needs to be specified');
+check(
+  '"B and D." -> B,D (used to be D only)',
+  andForm.correctLetters,
+  ['B', 'D'],
+);
+check(
+  '"B and D." is flagged as a multi-select question',
+  andForm.isMultiSelect,
+  true,
+);
+
+const blank = byStart('Which of the following settings affect');
+check(
+  'an unreadable answer is marked ungradable instead of defaulting to A',
+  blank.isGradable,
+  false,
+);
+check(
+  'an ungradable question is kept out of the exam',
+  buildBalancedExamSet([blank], TOPIC_LIST).examQuestions.some(
+    (q) => q.id === blank.id,
+  ),
+  false,
+);
+
+const belowLabel = byStart('A user has been locked out');
+check(
+  'a bare "Answer(s):" reads the answer from the lines below it -> B,C',
+  belowLabel.correctLetters,
+  ['B', 'C'],
+);
+check(
+  'those answer lines are not mistaken for the explanation',
+  belowLabel.explanation.startsWith('An administrator can unlock'),
+  true,
+);
+check(
+  'the question still keeps all four of its own options',
+  belowLabel.options.length,
+  4,
+);
+
+const glued = byStart('Custom Summary Formulas');
+check(
+  'a letter typed onto its option text "ATrue" -> A',
+  glued.correctLetters,
+  ['A'],
+);
+
+// End-to-end: answer these exactly the way the file states and score 4 / 4.
+const trickyGraded = gradeExamSession(
+  tricky.filter((q) => q.isGradable),
+  {
+    [runTogether.id]: ['E', 'A', 'D'], // out of order and complete
+    [withNote.id]: ['a', 'd', 'b'], // lower case and out of order
+    [certified.id]: ['C'],
+    [andForm.id]: ['D', 'B'],
+    [belowLabel.id]: ['C', 'B'],
+    [glued.id]: ['A'],
+  },
+);
+check(
+  'answering exactly what the file states scores 6 / 6',
+  trickyGraded.rawCorrectCount,
+  6,
+);
+check(
+  'nothing is listed as incorrect',
+  trickyGraded.incorrectQuestions.length,
+  0,
+);
+check(
+  'dropping one letter of a multi-answer question is still incorrect',
+  gradeExamSession(
+    tricky.filter((q) => q.isGradable),
+    {
+      [runTogether.id]: ['A', 'D'],
+    },
+  ).rawCorrectCount,
+  0,
+);
+
+/* ------------------------------------------------------------------ */
 console.log('\n3) Real source files\n');
 
 for (const file of ['Admin-201 Topic 1.md', 'Admin-201 Topic 2.md']) {
@@ -272,7 +533,7 @@ for (const file of ['Admin-201 Topic 1.md', 'Admin-201 Topic 2.md']) {
       suspicious++;
   }
   console.log(
-    `      ${file}: ${questions.length} questions parsed, ${suspicious} still read as multi-answer without cause`,
+    `      ${file}: ${questions.length} questions parsed, ${suspicious} still read as multi-answer without cause, ${questions.filter((q) => q.isGradable === false).length} unreadable answers excluded from the exam`,
   );
   if (suspicious > 0) failures++;
 }

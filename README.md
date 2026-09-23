@@ -4,26 +4,52 @@ A local-first, deterministic React exam simulator application that functions as 
 
 ---
 
-## ⚡ Quick Start (Instant Run)
+## ⚡ Quick Start
 
-### Method 1: Zero-Install Standalone Mode (Recommended)
-You do **not** need Node.js or any build tools installed. Simply:
-1. Double-click [`index.html`](file:///d:/Personal/Salesforce/Exam%20Dumps/index.html) or open it directly in any modern browser (Google Chrome, Microsoft Edge, Mozilla Firefox, Safari).
-2. Drag and drop `Admin topic1.1.md` or `Admin Exam Dump.md` into the file zone (or click **"Browse & Select Local Dump"**).
-3. The app will immediately parse all ~1,400+ questions, categorize them across the 8 ADM-201 topics, and present the pre-exam verification screen.
+The app is a Vite + React project. `index.html` at the repo root is the Vite entry point — it is
+**not** a standalone page and will not work if you double-click it directly from source.
 
-### Method 2: Standard Node / Vite Workflow
-If you prefer running via a Node.js development server:
+### Method 1: Development Server
 ```bash
-# 1. Install dependencies
 npm install
-
-# 2. Run the Vite development server
 npm run dev
+```
+Open the printed `http://localhost:5173` URL, then drag and drop `Admin-201 Topic 1.md` or
+`Admin-201 Topic 2.md` into the file zone (or click **"Browse & Select Local Dump"**).
+The app parses the questions, categorizes them across the 8 ADM-201 topics, and presents the
+pre-exam verification screen.
 
-# 3. Build for production
+### Method 2: Production Build (open `index.html` directly)
+```bash
 npm run build
 ```
+Produces `dist/`. Because the build uses relative asset paths (`base: './'`), you can
+double-click `dist/index.html` and it runs offline in any modern browser — fonts and
+styles are bundled, no CDN required.
+
+To preview the build over a local server instead:
+```bash
+npm run preview
+```
+
+### Method 3: Single-File Build (one portable HTML file)
+```bash
+npm run build:single
+```
+Produces a single self-contained `dist-single/index.html` (~900 KB) with all JavaScript and
+CSS inlined. Copy that one file anywhere and open it.
+
+### Verifying the Answer Key
+```bash
+npm run verify
+```
+Runs [scripts/verify-grading.mjs](scripts/verify-grading.mjs), which parses both source `.md`
+files and asserts that no question silently defaults to answer "A" and that no unreadable
+answer keys slip into the exam pool.
+
+> `legacy-standalone.html` is the retired pre-Vite version of the app (CDN React + in-browser
+> Babel). It is kept for reference only and does **not** contain the current parsing and
+> grading fixes.
 
 ---
 
@@ -57,7 +83,7 @@ The simulator hardcodes the official Salesforce Certified Administrator examinat
 
 ---
 
-## 📥 Expected Input File Schema (`Admin topic1.1.md`)
+## 📥 Expected Input File Schema (`Admin-201 Topic 1.md`)
 
 The parser is tolerant of markdown headers, numbering formats, multiple choice prefixes, inline answer strings, and explanations.
 
@@ -91,12 +117,40 @@ Explanation: Salesforce mobile app navigation menus support standard features an
 ```
 
 ### Supported Syntax Tolerances:
-- **Question Numbering:** `1. `, `1) `, `Question 1: `, `## 1. `
+- **Question Numbering:** `1. `, `1) `, `1: `, `Question 1: `, `## 1. `, and the no-space form `121.Which ...`
 - **Options:** `A. `, `a. `, `A) `, `[A] `, `A: `
-- **Answer Markers:** `Answer: B`, `Answer(s): B, C`, `Correct Answer: B`, `ANS: B`
-- **Answer Formats:** Single letter (`B`), comma-separated (`A, C`), or option text (`A. Profile, D. Manager`)
-- **Explanations:** `Why: ...`, `Explanation: ...`, `Rationale: ...`, `Note: ...`
-- **Metadata Cleaning:** Automatically strips trailing `Timestamp: ...` lines and promotional links.
+- **Answer Markers:** `Answer: B`, `**Answer:** B`, `Answer(s): B, C`, `Correct Answer: B`, `Certified Correct Answer: B`, `ANS: B`
+- **Answer Formats:**
+  - Single letter — `B`
+  - Comma / slash separated — `A, C` or `A/C`
+  - Prose conjunction — `B and D.`
+  - Compact run — `ADE` (expanded to A, D, E)
+  - Letter plus option text — `A. Profile, D. Manager`
+  - Glued letter and text — `ATrue` (matched only when the text equals an option exactly)
+  - Bare marker with the answer on the following lines:
+    ```markdown
+    Answer(s):
+    B. Permission Set
+    D. Sharing Rule
+    ```
+- **Explanations:** `Why: ...`, `Explanation: ...`, `Rationale: ...`, `Note: ...`, `Trainer Explanation & Concept: ...`
+- **Metadata Cleaning:** Strips trailing `Timestamp: ...` lines, bare date footers such as `# Dec. 4, 2025`, and promotional links.
+
+### Answer-Key Safety Rules
+
+The source file is the single source of truth. To stop silent mis-grading, the engine:
+
+- **Never guesses.** If an answer line cannot be read confidently, the question is marked
+  `isGradable: false` and is **excluded from the exam pool** rather than defaulting to "A".
+- **Locks the first answer.** Once a question's answer is captured, a stray later `Answer:`
+  line cannot overwrite it.
+- **Preserves multi-answer keys.** A key such as `B and D` stays `[B, D]`; it is never
+  truncated to a single letter.
+- **Re-verifies at grade time.** [src/services/grader.js](src/services/grader.js) re-derives the
+  key from the original file text when scoring, so parsing and grading must agree.
+- **Scores multi-select all-or-nothing.** Every required letter must be selected and no extras.
+
+The pre-exam screen reports how many questions are usable and warns you if any were skipped.
 
 ---
 
@@ -126,14 +180,16 @@ Because source dumps lack a category field, the engine assigns questions to the 
 ## 🎯 How to Use the Application
 
 ### 1. Uploading & Parsing
-- Open [`index.html`](file:///d:/Personal/Salesforce/Exam%20Dumps/index.html).
-- Drop `Admin topic1.1.md` or `Admin Exam Dump.md` into the dropzone.
+- Start the app with `npm run dev`, or open `dist/index.html` after `npm run build`.
+- Drop `Admin-201 Topic 1.md` or `Admin-201 Topic 2.md` into the dropzone, or use
+  **"Or paste question text manually"** to paste raw question text instead.
 - The parser extracts questions asynchronously without blocking the browser.
 
 ### 2. Pre-Exam Verification Screen
-- Review the total parsed questions and the breakdown across all 8 topic categories.
+- Review the total usable questions and the breakdown across all 8 topic categories.
 - Check how many questions were sourced from your file vs. fallback-generated.
-- Acknowledge the procedural rules checkbox and click **"Begin 60-Question Exam"**.
+- If any questions had unreadable answer keys, an amber note reports how many were skipped.
+- Acknowledge the procedural rules checkbox and click **"Begin Examination"**.
 
 ### 3. Taking the Exam
 - The 105-minute countdown clock runs continuously in the top right.
@@ -148,8 +204,48 @@ Because source dumps lack a category field, the engine assigns questions to the 
 ### 5. Final Submission & Results Analysis
 On question 60 (or automatically if the 105-minute timer expires), the proctor computes your score:
 - **Pass/Fail Outcome:** Clear visual banner with score percentage and count (e.g. `45 / 60 (75.0%)`).
-- **Incorrect Answers Tab:** Detailed review of every question missed, showing your recorded answer, the confirmed correct answer, and full explanation.
-- **Correct Answers Tab:** Review of all correctly answered questions.
+- **Incorrect Answers Tab:** Every question you missed, shown with the question text, your
+  submitted answer(s), the correct answer(s), the exact answer line quoted from your file
+  (*"Stated in your file: ..."*), and the explanation.
+- **Correct Answers Tab:** The same detail for every question you answered correctly, so you can
+  confirm the key against your source file.
 - **Topic Blueprint Breakdown:** Visual progress bars displaying your accuracy percentage in each of the 8 Salesforce domains.
 - **Generated Questions Audit:** Dedicated audit section listing every fallback-generated question tagged `source: "generated"`.
 - **Retake Options:** Click **"Retake Exam"** to draw a fresh randomized sample of 60 questions from your bank.
+
+---
+
+## 🗂️ Project Structure
+
+```
+index.html                   Vite entry point (loads src/main.jsx)
+legacy-standalone.html       Retired pre-Vite single-file app (reference only)
+vite.config.js               Standard build → dist/   (base: './' for file:// use)
+vite.config.single.js        Single-file build → dist-single/
+tailwind.config.js           Tailwind content paths and theme
+postcss.config.js            Tailwind + Autoprefixer pipeline
+scripts/
+  verify-grading.mjs         Answer-key regression checks (npm run verify)
+src/
+  main.jsx                   React root; imports index.css
+  index.css                  Self-hosted fonts + Tailwind directives
+  App.jsx                    Screen router
+  context/ExamContext.jsx    Exam state, timer, pause, submission
+  components/                FileUpload, PreExam, Exam, Pause, Results screens
+  constants/examConfig.js    Blueprint weights, timing, pass mark
+  services/
+    parser.js                Raw text → question blocks
+    answerKey.js             Answer line → correct letters
+    categorizer.js           Keyword heuristic → blueprint topic
+    generator.js             Balanced 60-question set + fallback backfill
+    grader.js                Scoring with answer-key re-verification
+```
+
+---
+
+## 🔌 Offline Behaviour
+
+The app has no runtime network dependencies. React, Tailwind CSS, and the Inter / JetBrains Mono
+fonts (latin subsets) are all bundled at build time, so `dist/index.html` and
+`dist-single/index.html` work with no internet connection. Uploaded files are read in the
+browser only and are never transmitted anywhere.
